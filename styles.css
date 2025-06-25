@@ -22,15 +22,103 @@
   align-items: center;
 }
 
+.puzzle-piece {
+  cursor: grab;
+}
+
+.puzzle-piece:active {
+  cursor: grabbing;
+}
+
+.puzzle-piece.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
 .puzzle-piece canvas {
   max-width: 100%;
   max-height: 100%;
   border: 2px solid #ccc;
   border-radius: 5px;
+  transition: transform 0.2s ease;
+}
+
+.puzzle-piece:hover canvas {
+  transform: scale(1.05);
 }
 
 body.dragover {
   background-color: #f0f8ff;
   border: 3px dashed #007bff;
   transition: all 0.3s ease;
+}
+
+#puzzle-container.completed {
+  animation: celebrate 0.5s ease-in-out;
+}
+
+@keyframes celebrate {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.completion-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.completion-message {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: bounceIn 0.5s ease-out;
+}
+
+.completion-message h2 {
+  color: #4caf50;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.completion-message p {
+  color: #666;
+  font-size: 16px;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
