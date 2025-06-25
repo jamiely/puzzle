@@ -1,23 +1,25 @@
-const dropArea = document.getElementById('drop-area');
 const fileInput = document.getElementById('file-input');
 const droppedImage = document.getElementById('dropped-image');
 
-dropArea.addEventListener('click', () => {
+document.addEventListener('click', () => {
     fileInput.click();
 });
 
-dropArea.addEventListener('dragover', (e) => {
+// Page-wide drag and drop events
+document.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropArea.classList.add('dragover');
+    document.body.classList.add('dragover');
 });
 
-dropArea.addEventListener('dragleave', () => {
-    dropArea.classList.remove('dragover');
+document.addEventListener('dragleave', (e) => {
+    if (e.clientX === 0 && e.clientY === 0) {
+        document.body.classList.remove('dragover');
+    }
 });
 
-dropArea.addEventListener('drop', (e) => {
+document.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropArea.classList.remove('dragover');
+    document.body.classList.remove('dragover');
     
     const files = e.dataTransfer.files;
     if (files.length > 0) {

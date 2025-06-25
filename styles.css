@@ -1,22 +1,9 @@
-#drop-area {
-    width: 400px;
-    height: 200px;
-    border: 2px dashed #ccc;
-    border-radius: 10px;
+#instructions {
     text-align: center;
-    padding: 20px;
-    margin: 20px auto;
-    cursor: pointer;
-    transition: border-color 0.3s ease;
-}
-
-#drop-area:hover {
-    border-color: #007bff;
-}
-
-#drop-area.dragover {
-    border-color: #007bff;
-    background-color: #f0f8ff;
+    margin: 50px 20px;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    color: #666;
 }
 
 #image-display {
@@ -29,4 +16,10 @@
     max-height: 500px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+body.dragover {
+    background-color: #f0f8ff;
+    border: 3px dashed #007bff;
+    transition: all 0.3s ease;
 }
