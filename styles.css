@@ -6,17 +6,29 @@
     color: #666;
 }
 
-#image-display {
-    text-align: center;
-    margin: 20px;
+#puzzle-container {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
 }
 
-#dropped-image {
-    max-width: 100%;
-    max-height: 500px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.puzzle-piece {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+.puzzle-piece canvas {
+    max-width: 100%;
+    max-height: 100%;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+}
+
 
 body.dragover {
     background-color: #f0f8ff;
