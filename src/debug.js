@@ -4,6 +4,8 @@ let debugMenuVisible = false;
 let showPieceIds = false;
 let gridRows = 2;
 let gridColumns = 2;
+let pendingGridRows = 2;
+let pendingGridColumns = 2;
 let currentImageSrc = null;
 let createPuzzleCallback = null;
 
@@ -25,29 +27,51 @@ export function generatePieceId(index) {
 // Initialize debug functionality
 export function initDebug() {
   const debugMenu = document.getElementById('debug-menu');
-  const debugClose = document.getElementById('debug-close');
+  const debugCancel = document.getElementById('debug-cancel');
+  const debugSubmit = document.getElementById('debug-submit');
   const showPieceIdsCheckbox = document.getElementById('show-piece-ids');
   const gridRowsInput = document.getElementById('grid-rows');
   const gridColumnsInput = document.getElementById('grid-columns');
 
-  // Close debug menu
-  debugClose.addEventListener('click', hideDebugMenu);
+  // Handle cancel button - close menu and revert changes
+  debugCancel.addEventListener('click', () => {
+    // Revert pending changes to current values
+    gridRowsInput.value = gridRows;
+    gridColumnsInput.value = gridColumns;
+    pendingGridRows = gridRows;
+    pendingGridColumns = gridColumns;
+    hideDebugMenu();
+  });
 
-  // Handle piece ID toggle
+  // Handle submit button - apply changes and close menu
+  debugSubmit.addEventListener('click', () => {
+    // Apply pending changes
+    const hasGridChanges =
+      pendingGridRows !== gridRows || pendingGridColumns !== gridColumns;
+    gridRows = pendingGridRows;
+    gridColumns = pendingGridColumns;
+
+    // Reslice puzzle if grid changed
+    if (hasGridChanges) {
+      reslicePuzzleIfActive();
+    }
+
+    hideDebugMenu();
+  });
+
+  // Handle piece ID toggle (immediate effect)
   showPieceIdsCheckbox.addEventListener('change', (e) => {
     showPieceIds = e.target.checked;
     updatePieceIdDisplay();
   });
 
-  // Handle grid size changes
+  // Handle grid size changes (store as pending)
   gridRowsInput.addEventListener('change', (e) => {
-    gridRows = parseInt(e.target.value) || 2;
-    reslicePuzzleIfActive();
+    pendingGridRows = parseInt(e.target.value) || 2;
   });
 
   gridColumnsInput.addEventListener('change', (e) => {
-    gridColumns = parseInt(e.target.value) || 2;
-    reslicePuzzleIfActive();
+    pendingGridColumns = parseInt(e.target.value) || 2;
   });
 
   // Close debug menu when clicking outside
@@ -68,7 +92,8 @@ export function initDebug() {
       showDebugMenu();
     } else if (e.key === 'Escape' && debugMenuVisible) {
       e.preventDefault();
-      hideDebugMenu();
+      // Treat Escape as cancel
+      debugCancel.click();
     } else if (e.key.toLowerCase() === 'a') {
       e.preventDefault();
       togglePieceIds();
@@ -79,6 +104,15 @@ export function initDebug() {
 // Show debug menu
 function showDebugMenu() {
   const debugMenu = document.getElementById('debug-menu');
+  const gridRowsInput = document.getElementById('grid-rows');
+  const gridColumnsInput = document.getElementById('grid-columns');
+
+  // Initialize pending values to current values
+  pendingGridRows = gridRows;
+  pendingGridColumns = gridColumns;
+  gridRowsInput.value = gridRows;
+  gridColumnsInput.value = gridColumns;
+
   debugMenu.style.display = 'flex';
   debugMenuVisible = true;
 }

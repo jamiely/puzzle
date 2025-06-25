@@ -187,19 +187,36 @@ body.dragover {
   font-size: 14px;
 }
 
-#debug-close {
-  background: #007bff;
-  color: white;
-  border: none;
+.debug-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.debug-buttons button {
+  flex: 1;
   padding: 10px 20px;
+  border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
-  margin-top: 20px;
-  width: 100%;
 }
 
-#debug-close:hover {
+#debug-cancel {
+  background: #6c757d;
+  color: white;
+}
+
+#debug-cancel:hover {
+  background: #545b62;
+}
+
+#debug-submit {
+  background: #007bff;
+  color: white;
+}
+
+#debug-submit:hover {
   background: #0056b3;
 }
 
