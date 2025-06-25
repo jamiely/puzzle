@@ -1,14 +1,19 @@
-export function splitImageIntoPieces(img, testMode = false) {
+export function splitImageIntoPieces(
+  img,
+  testMode = false,
+  rows = 2,
+  cols = 2
+) {
   let pieceWidth, pieceHeight;
 
   if (testMode) {
     // Test mode - use original 1:1 sizing for test compatibility
-    pieceWidth = img.width / 2;
-    pieceHeight = img.height / 2;
+    pieceWidth = img.width / cols;
+    pieceHeight = img.height / rows;
   } else {
     // Scale pieces to be up to 40% of the minimum viewport dimension
     const minViewportDim = Math.min(window.innerWidth, window.innerHeight);
-    const maxPuzzleSize = minViewportDim * 0.4 * 2; // 40% for each piece, so 80% total for puzzle
+    const maxPuzzleSize = minViewportDim * 0.4 * Math.max(rows, cols); // Scale based on grid size
     const scale = Math.min(
       maxPuzzleSize / img.width,
       maxPuzzleSize / img.height
@@ -16,13 +21,13 @@ export function splitImageIntoPieces(img, testMode = false) {
 
     const scaledWidth = img.width * scale;
     const scaledHeight = img.height * scale;
-    pieceWidth = scaledWidth / 2;
-    pieceHeight = scaledHeight / 2;
+    pieceWidth = scaledWidth / cols;
+    pieceHeight = scaledHeight / rows;
   }
   const pieces = [];
 
-  for (let row = 0; row < 2; row++) {
-    for (let col = 0; col < 2; col++) {
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
@@ -31,10 +36,10 @@ export function splitImageIntoPieces(img, testMode = false) {
 
       ctx.drawImage(
         img,
-        col * (img.width / 2),
-        row * (img.height / 2),
-        img.width / 2,
-        img.height / 2,
+        col * (img.width / cols),
+        row * (img.height / rows),
+        img.width / cols,
+        img.height / rows,
         0,
         0,
         pieceWidth,
@@ -43,8 +48,8 @@ export function splitImageIntoPieces(img, testMode = false) {
 
       pieces.push({
         canvas: canvas,
-        originalPosition: row * 2 + col,
-        currentPosition: row * 2 + col,
+        originalPosition: row * cols + col,
+        currentPosition: row * cols + col,
         testMode: testMode,
       });
     }

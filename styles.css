@@ -178,6 +178,15 @@ body.dragover {
   transform: scale(1.2);
 }
 
+.debug-option input[type='number'] {
+  margin-left: 10px;
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
 #debug-close {
   background: #007bff;
   color: white;

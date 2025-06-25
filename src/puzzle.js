@@ -12,6 +12,7 @@ import {
   handleKeyDown,
   getCurrentDraggedPiece as getInteractionCurrentDraggedPiece,
 } from './interaction.js';
+import { getGridRows, getGridColumns, setCurrentPuzzle } from './debug.js';
 
 // Global state
 export let puzzleActive = false;
@@ -20,8 +21,15 @@ let puzzlePieces = [];
 export function createPuzzle(imageSrc, testMode = false) {
   const img = new Image();
   img.onload = () => {
-    const pieces = splitImageIntoPieces(img, testMode);
+    const rows = testMode ? 2 : getGridRows();
+    const cols = testMode ? 2 : getGridColumns();
+    const pieces = splitImageIntoPieces(img, testMode, rows, cols);
     displayPuzzle(pieces);
+
+    // Register this puzzle with debug system for auto-reslicing (only if not in test mode)
+    if (!testMode) {
+      setCurrentPuzzle(imageSrc, createPuzzle);
+    }
   };
   img.src = imageSrc;
 }
@@ -36,6 +44,16 @@ export function displayPuzzle(pieces) {
   // Tests pass a testMode parameter or set a specific flag, normal gameplay uses free positioning
   const useGridMode = pieces.length > 0 && pieces[0].testMode === true;
   puzzleContainer.style.display = useGridMode ? 'grid' : 'block';
+
+  if (useGridMode) {
+    // Calculate grid dimensions for test mode
+    const totalPieces = pieces.length;
+    const cols =
+      Math.sqrt(totalPieces) === Math.floor(Math.sqrt(totalPieces))
+        ? Math.sqrt(totalPieces)
+        : 2; // Default to 2 columns if not a perfect square
+    puzzleContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  }
 
   instructions.style.display = 'none';
   puzzleActive = true;

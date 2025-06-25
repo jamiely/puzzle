@@ -2,6 +2,10 @@
 
 let debugMenuVisible = false;
 let showPieceIds = false;
+let gridRows = 2;
+let gridColumns = 2;
+let currentImageSrc = null;
+let createPuzzleCallback = null;
 
 // Generate piece ID in A-Z, AA-ZZ format
 export function generatePieceId(index) {
@@ -23,6 +27,8 @@ export function initDebug() {
   const debugMenu = document.getElementById('debug-menu');
   const debugClose = document.getElementById('debug-close');
   const showPieceIdsCheckbox = document.getElementById('show-piece-ids');
+  const gridRowsInput = document.getElementById('grid-rows');
+  const gridColumnsInput = document.getElementById('grid-columns');
 
   // Close debug menu
   debugClose.addEventListener('click', hideDebugMenu);
@@ -31,6 +37,17 @@ export function initDebug() {
   showPieceIdsCheckbox.addEventListener('change', (e) => {
     showPieceIds = e.target.checked;
     updatePieceIdDisplay();
+  });
+
+  // Handle grid size changes
+  gridRowsInput.addEventListener('change', (e) => {
+    gridRows = parseInt(e.target.value) || 2;
+    reslicePuzzleIfActive();
+  });
+
+  gridColumnsInput.addEventListener('change', (e) => {
+    gridColumns = parseInt(e.target.value) || 2;
+    reslicePuzzleIfActive();
   });
 
   // Close debug menu when clicking outside
@@ -172,4 +189,28 @@ export function isShowingPieceIds() {
 
 export function isDebugMenuVisible() {
   return debugMenuVisible;
+}
+
+export function getGridRows() {
+  return gridRows;
+}
+
+export function getGridColumns() {
+  return gridColumns;
+}
+
+// Set the current image source and puzzle creation callback for auto-reslicing
+export function setCurrentPuzzle(imageSrc, puzzleCreator) {
+  currentImageSrc = imageSrc;
+  createPuzzleCallback = puzzleCreator;
+}
+
+// Reslice puzzle if one is currently active
+function reslicePuzzleIfActive() {
+  if (currentImageSrc && createPuzzleCallback) {
+    // Small delay to ensure UI updates are complete
+    setTimeout(() => {
+      createPuzzleCallback(currentImageSrc);
+    }, 100);
+  }
 }
