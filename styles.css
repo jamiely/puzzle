@@ -1,0 +1,32 @@
+#drop-area {
+    width: 400px;
+    height: 200px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    text-align: center;
+    padding: 20px;
+    margin: 20px auto;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+#drop-area:hover {
+    border-color: #007bff;
+}
+
+#drop-area.dragover {
+    border-color: #007bff;
+    background-color: #f0f8ff;
+}
+
+#image-display {
+    text-align: center;
+    margin: 20px;
+}
+
+#dropped-image {
+    max-width: 100%;
+    max-height: 500px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
