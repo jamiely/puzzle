@@ -1,8 +1,10 @@
 const fileInput = document.getElementById('file-input');
-const droppedImage = document.getElementById('dropped-image');
+let puzzleActive = false;
 
 document.addEventListener('click', () => {
-    fileInput.click();
+    if (!puzzleActive) {
+        fileInput.click();
+    }
 });
 
 // Page-wide drag and drop events
@@ -86,8 +88,12 @@ function splitImageIntoPieces(img) {
 
 function displayPuzzle(pieces) {
     const puzzleContainer = document.getElementById('puzzle-container');
+    const instructions = document.getElementById('instructions');
+    
     puzzleContainer.innerHTML = '';
     puzzleContainer.style.display = 'grid';
+    instructions.style.display = 'none';
+    puzzleActive = true;
     
     pieces.forEach((piece, index) => {
         const pieceContainer = document.createElement('div');
