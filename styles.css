@@ -16,6 +16,10 @@
   overflow: hidden;
 }
 
+#puzzle-container[style*='display: block'] {
+  display: block !important;
+}
+
 .puzzle-piece {
   position: absolute;
   cursor: grab;

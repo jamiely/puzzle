@@ -54,6 +54,7 @@ export function displayPuzzle(pieces) {
     if (useGridMode) {
       // Grid mode - simple layout for tests
       piece.currentPosition = index;
+      piece.element = pieceContainer;
     } else {
       // Free positioning mode - scatter pieces around
       const pieceWidth = piece.canvas.width;
@@ -75,6 +76,8 @@ export function displayPuzzle(pieces) {
       piece.y = y;
       piece.rotation = randomRotation;
       piece.element = pieceContainer;
+      piece.width = pieceWidth;
+      piece.height = pieceHeight;
 
       // Add to placed pieces for collision detection
       placedPieces.push({ x, y, width: pieceWidth, height: pieceHeight });
