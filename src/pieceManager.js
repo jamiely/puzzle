@@ -45,6 +45,7 @@ export function splitImageIntoPieces(img, testMode = false) {
         canvas: canvas,
         originalPosition: row * 2 + col,
         currentPosition: row * 2 + col,
+        testMode: testMode,
       });
     }
   }

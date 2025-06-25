@@ -79,7 +79,7 @@ describe('Puzzle functionality', () => {
     it('should create puzzle when image loads', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
 
       // Wait for image to load (mocked in setup)
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -133,7 +133,7 @@ describe('Puzzle functionality', () => {
     it('should track puzzle pieces correctly', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
 
       // Wait for image to load and puzzle to be created
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -154,7 +154,7 @@ describe('Puzzle functionality', () => {
     it('should make pieces draggable', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -187,7 +187,7 @@ describe('Puzzle functionality', () => {
     it('should add dragging class on dragstart', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -206,7 +206,7 @@ describe('Puzzle functionality', () => {
     it('should remove dragging class on dragend', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -224,7 +224,7 @@ describe('Puzzle functionality', () => {
     it('should handle dragover event and prevent default', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -245,7 +245,7 @@ describe('Puzzle functionality', () => {
     it('should handle piece swapping on drop', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -281,7 +281,7 @@ describe('Puzzle functionality', () => {
     it('should not swap piece with itself', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -305,7 +305,7 @@ describe('Puzzle functionality', () => {
     it('should handle multiple drag operations', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -471,7 +471,7 @@ describe('Puzzle functionality', () => {
 
       // This should not throw an error
       expect(() => {
-        createPuzzle(mockImageSrc);
+        createPuzzle(mockImageSrc, true);
       }).not.toThrow();
 
       // Restore original Image
@@ -482,7 +482,7 @@ describe('Puzzle functionality', () => {
   describe('puzzle state and lifecycle', () => {
     it('should create puzzle and display pieces', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
@@ -496,14 +496,14 @@ describe('Puzzle functionality', () => {
       const mockImageSrc2 = 'data:image/jpeg;base64,test2';
 
       // Create first puzzle
-      createPuzzle(mockImageSrc1);
+      createPuzzle(mockImageSrc1, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');
       expect(puzzleContainer.children.length).toBe(4);
 
       // Create second puzzle (should replace first)
-      createPuzzle(mockImageSrc2);
+      createPuzzle(mockImageSrc2, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(puzzleContainer.children.length).toBe(4);
@@ -513,7 +513,7 @@ describe('Puzzle functionality', () => {
     it('should maintain piece integrity during lifecycle', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const puzzleContainer = document.getElementById('puzzle-container');

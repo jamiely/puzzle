@@ -73,7 +73,7 @@ describe('Puzzle Completion Detection', () => {
       // Test the completion logic directly using createPuzzle which sets up the full state
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
 
       // Fast forward timers to trigger image load
       vi.runAllTimers();
@@ -98,7 +98,7 @@ describe('Puzzle Completion Detection', () => {
 
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       vi.runAllTimers();
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -224,7 +224,7 @@ describe('Puzzle Completion Detection', () => {
 
     it('should add completed class to puzzle container', async () => {
       const mockImg = { width: 200, height: 200 };
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
       displayPuzzle(pieces);
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -452,7 +452,7 @@ describe('Puzzle Completion Detection', () => {
       global.setTimeout = mockSetTimeout;
 
       const mockImg = { width: 200, height: 200 };
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
       displayPuzzle(pieces);
 
       // Clear previous calls
@@ -479,7 +479,7 @@ describe('Puzzle Completion Detection', () => {
   describe('UI State Changes on Completion', () => {
     it('should maintain puzzle container grid display when completed', async () => {
       const mockImg = { width: 200, height: 200 };
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
       displayPuzzle(pieces);
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -497,7 +497,7 @@ describe('Puzzle Completion Detection', () => {
 
     it('should preserve puzzle pieces structure when completed', async () => {
       const mockImg = { width: 200, height: 200 };
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
       displayPuzzle(pieces);
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -606,7 +606,7 @@ describe('Puzzle Completion Detection', () => {
   describe('Integration with Drag and Drop', () => {
     it('should support drag and drop functionality', async () => {
       const mockImg = { width: 200, height: 200 };
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
       displayPuzzle(pieces);
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -627,7 +627,7 @@ describe('Puzzle Completion Detection', () => {
 
     it('should handle drag and drop event structure', async () => {
       const mockImg = { width: 200, height: 200 };
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
       displayPuzzle(pieces);
 
       const puzzleContainer = document.getElementById('puzzle-container');
@@ -647,7 +647,7 @@ describe('Puzzle Completion Detection', () => {
 
     it('should support multiple drag operations without errors', async () => {
       const mockImg = { width: 200, height: 200 };
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
       displayPuzzle(pieces);
 
       const puzzleContainer = document.getElementById('puzzle-container');

@@ -41,7 +41,7 @@ describe('Drag and Drop Functionality', () => {
 
   const createPuzzleAndWait = async () => {
     const mockImageSrc = 'data:image/jpeg;base64,test';
-    createPuzzle(mockImageSrc);
+    createPuzzle(mockImageSrc, true);
     await new Promise((resolve) => setTimeout(resolve, 10));
     return puzzleContainer.querySelectorAll('.puzzle-piece');
   };

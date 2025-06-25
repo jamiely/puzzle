@@ -77,7 +77,7 @@ describe('Piece Swapping Logic', () => {
     it('should maintain original positions unchanged during swaps', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -101,7 +101,7 @@ describe('Piece Swapping Logic', () => {
     it('should track current positions correctly after multiple swaps', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -128,7 +128,7 @@ describe('Piece Swapping Logic', () => {
     it('should swap canvas elements between containers', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -155,7 +155,7 @@ describe('Piece Swapping Logic', () => {
     it('should maintain canvas properties after swapping', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -188,7 +188,7 @@ describe('Piece Swapping Logic', () => {
     it('should handle canvas elements with no parent correctly', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -214,7 +214,7 @@ describe('Piece Swapping Logic', () => {
     it('should update internal pieces array after swap', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -239,7 +239,7 @@ describe('Piece Swapping Logic', () => {
     it('should handle array boundaries correctly', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -267,7 +267,7 @@ describe('Piece Swapping Logic', () => {
     it('should maintain array length after swaps', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const initialPieceCount =
@@ -309,7 +309,7 @@ describe('Piece Swapping Logic', () => {
     it('should maintain original positions as immutable', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -335,7 +335,7 @@ describe('Piece Swapping Logic', () => {
     it('should update current positions after swaps', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -366,7 +366,7 @@ describe('Piece Swapping Logic', () => {
     it('should handle null or undefined drag state', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -385,7 +385,7 @@ describe('Piece Swapping Logic', () => {
     it('should prevent self-swapping', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -406,7 +406,7 @@ describe('Piece Swapping Logic', () => {
     it('should handle rapid consecutive swaps', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -431,7 +431,7 @@ describe('Piece Swapping Logic', () => {
     it('should handle drag operations without proper drop targets', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -453,7 +453,7 @@ describe('Piece Swapping Logic', () => {
     it('should handle malformed drag events', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -478,7 +478,7 @@ describe('Piece Swapping Logic', () => {
     it('should maintain puzzle state after invalid swap attempts', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -519,7 +519,7 @@ describe('Piece Swapping Logic', () => {
     it('should maintain consistent DOM structure after swaps', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -542,7 +542,7 @@ describe('Piece Swapping Logic', () => {
     it('should preserve event listeners after swaps', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -568,7 +568,7 @@ describe('Piece Swapping Logic', () => {
     it('should handle cleanup after multiple swap operations', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -606,7 +606,7 @@ describe('Piece Swapping Logic', () => {
     it('should not create memory leaks during swaps', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -643,7 +643,7 @@ describe('Piece Swapping Logic', () => {
     it('should handle concurrent drag operations gracefully', async () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
-      createPuzzle(mockImageSrc);
+      createPuzzle(mockImageSrc, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');

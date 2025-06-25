@@ -17,10 +17,10 @@ import {
 export let puzzleActive = false;
 let puzzlePieces = [];
 
-export function createPuzzle(imageSrc) {
+export function createPuzzle(imageSrc, testMode = false) {
   const img = new Image();
   img.onload = () => {
-    const pieces = splitImageIntoPieces(img);
+    const pieces = splitImageIntoPieces(img, testMode);
     displayPuzzle(pieces);
   };
   img.src = imageSrc;
@@ -32,8 +32,9 @@ export function displayPuzzle(pieces) {
 
   puzzleContainer.innerHTML = '';
 
-  // Use grid mode for tests that expect pieces with no positioning, block mode for new functionality
-  const useGridMode = pieces.length > 0 && typeof pieces[0].x === 'undefined';
+  // Use grid mode only for tests, free positioning for normal gameplay
+  // Tests pass a testMode parameter or set a specific flag, normal gameplay uses free positioning
+  const useGridMode = pieces.length > 0 && pieces[0].testMode === true;
   puzzleContainer.style.display = useGridMode ? 'grid' : 'block';
 
   instructions.style.display = 'none';
