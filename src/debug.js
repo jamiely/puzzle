@@ -101,8 +101,8 @@ function calculatePieceIdPosition(pieceElement) {
 
   // Calculate a small offset towards top-right (screen coordinates)
   // Use a smaller offset so it appears closer to the piece
-  const offsetX = canvasWidth * 0.15; // 15% of width to the right
-  const offsetY = canvasHeight * 0.15; // 15% of height upward
+  const offsetX = canvasWidth * 0.49;
+  const offsetY = canvasHeight * 0.49;
 
   return {
     left: centerX + offsetX,
