@@ -24,7 +24,7 @@ describe('Puzzle functionality', () => {
         height: 200,
       };
 
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
 
       expect(pieces).toHaveLength(4);
       expect(pieces[0].originalPosition).toBe(0);
@@ -39,7 +39,7 @@ describe('Puzzle functionality', () => {
         height: 300,
       };
 
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
 
       pieces.forEach((piece) => {
         expect(piece.canvas.width).toBe(200);
@@ -331,7 +331,7 @@ describe('Puzzle functionality', () => {
         height: 300,
       };
 
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
 
       pieces.forEach((piece) => {
         expect(piece.canvas).toBeInstanceOf(HTMLCanvasElement);
@@ -346,7 +346,7 @@ describe('Puzzle functionality', () => {
         height: 200,
       };
 
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
 
       expect(pieces).toHaveLength(4);
       pieces.forEach((piece) => {
@@ -361,7 +361,7 @@ describe('Puzzle functionality', () => {
         height: 4,
       };
 
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
 
       expect(pieces).toHaveLength(4);
       pieces.forEach((piece) => {
@@ -378,7 +378,7 @@ describe('Puzzle functionality', () => {
         height: 400,
       };
 
-      const pieces = splitImageIntoPieces(mockImg);
+      const pieces = splitImageIntoPieces(mockImg, true);
 
       // Verify 2x2 grid positions
       expect(pieces[0].originalPosition).toBe(0); // top-left
