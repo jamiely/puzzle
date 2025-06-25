@@ -4,6 +4,7 @@ import {
   startAutoLoadTimer,
   cancelAutoLoadTimer,
 } from './src/autoload.js';
+import { initDebug } from './src/debug.js';
 
 const fileInput = document.getElementById('file-input');
 
@@ -50,4 +51,5 @@ fileInput.addEventListener('change', (e) => {
 // Start the auto-load timer when the page loads
 document.addEventListener('DOMContentLoaded', () => {
   startAutoLoadTimer();
+  initDebug();
 });

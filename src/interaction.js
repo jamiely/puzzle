@@ -1,6 +1,7 @@
 import { updatePieceTransform } from './positioning.js';
 import { checkPuzzleCompletion } from './completion.js';
 import { getPuzzlePieces } from './puzzle.js';
+import { updatePieceIdPositions } from './debug.js';
 
 // Interaction state
 let selectedPiece = null;
@@ -85,6 +86,7 @@ function handleMouseMove(e) {
   selectedPiece.y = clampedY;
 
   updatePieceTransform(selectedPiece);
+  updatePieceIdPositions();
 }
 
 function handleMouseUp() {
@@ -120,12 +122,14 @@ export function handleKeyDown(e) {
       e.preventDefault();
       selectedPiece.rotation -= 30;
       updatePieceTransform(selectedPiece);
+      updatePieceIdPositions();
       checkPuzzleCompletion();
       break;
     case 'ArrowRight':
       e.preventDefault();
       selectedPiece.rotation += 30;
       updatePieceTransform(selectedPiece);
+      updatePieceIdPositions();
       checkPuzzleCompletion();
       break;
   }
