@@ -4,8 +4,10 @@ let debugMenuVisible = false;
 let showPieceIds = false;
 let gridRows = 2;
 let gridColumns = 2;
+let pieceScale = 100;
 let pendingGridRows = 2;
 let pendingGridColumns = 2;
+let pendingPieceScale = 100;
 let currentImageSrc = null;
 let createPuzzleCallback = null;
 
@@ -32,14 +34,17 @@ export function initDebug() {
   const showPieceIdsCheckbox = document.getElementById('show-piece-ids');
   const gridRowsInput = document.getElementById('grid-rows');
   const gridColumnsInput = document.getElementById('grid-columns');
+  const pieceScaleInput = document.getElementById('piece-scale');
 
   // Handle cancel button - close menu and revert changes
   debugCancel.addEventListener('click', () => {
     // Revert pending changes to current values
     gridRowsInput.value = gridRows;
     gridColumnsInput.value = gridColumns;
+    pieceScaleInput.value = pieceScale;
     pendingGridRows = gridRows;
     pendingGridColumns = gridColumns;
+    pendingPieceScale = pieceScale;
     hideDebugMenu();
   });
 
@@ -48,11 +53,14 @@ export function initDebug() {
     // Apply pending changes
     const hasGridChanges =
       pendingGridRows !== gridRows || pendingGridColumns !== gridColumns;
+    const hasScaleChanges = pendingPieceScale !== pieceScale;
+
     gridRows = pendingGridRows;
     gridColumns = pendingGridColumns;
+    pieceScale = pendingPieceScale;
 
-    // Reslice puzzle if grid changed
-    if (hasGridChanges) {
+    // Reslice puzzle if any settings changed
+    if (hasGridChanges || hasScaleChanges) {
       reslicePuzzleIfActive();
     }
 
@@ -72,6 +80,11 @@ export function initDebug() {
 
   gridColumnsInput.addEventListener('change', (e) => {
     pendingGridColumns = parseInt(e.target.value) || 2;
+  });
+
+  // Handle piece scale changes (store as pending)
+  pieceScaleInput.addEventListener('change', (e) => {
+    pendingPieceScale = parseInt(e.target.value) || 100;
   });
 
   // Close debug menu when clicking outside
@@ -106,12 +119,15 @@ function showDebugMenu() {
   const debugMenu = document.getElementById('debug-menu');
   const gridRowsInput = document.getElementById('grid-rows');
   const gridColumnsInput = document.getElementById('grid-columns');
+  const pieceScaleInput = document.getElementById('piece-scale');
 
   // Initialize pending values to current values
   pendingGridRows = gridRows;
   pendingGridColumns = gridColumns;
+  pendingPieceScale = pieceScale;
   gridRowsInput.value = gridRows;
   gridColumnsInput.value = gridColumns;
+  pieceScaleInput.value = pieceScale;
 
   debugMenu.style.display = 'flex';
   debugMenuVisible = true;
@@ -231,6 +247,10 @@ export function getGridRows() {
 
 export function getGridColumns() {
   return gridColumns;
+}
+
+export function getPieceScale() {
+  return pieceScale;
 }
 
 // Set the current image source and puzzle creation callback for auto-reslicing

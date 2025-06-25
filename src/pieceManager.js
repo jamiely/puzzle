@@ -2,7 +2,8 @@ export function splitImageIntoPieces(
   img,
   testMode = false,
   rows = 2,
-  cols = 2
+  cols = 2,
+  scalePercentage = 100
 ) {
   let pieceWidth, pieceHeight;
 
@@ -14,13 +15,16 @@ export function splitImageIntoPieces(
     // Scale pieces to be up to 40% of the minimum viewport dimension
     const minViewportDim = Math.min(window.innerWidth, window.innerHeight);
     const maxPuzzleSize = minViewportDim * 0.4 * Math.max(rows, cols); // Scale based on grid size
-    const scale = Math.min(
+    const baseScale = Math.min(
       maxPuzzleSize / img.width,
       maxPuzzleSize / img.height
     );
 
-    const scaledWidth = img.width * scale;
-    const scaledHeight = img.height * scale;
+    // Apply the user-defined scale percentage
+    const finalScale = baseScale * (scalePercentage / 100);
+
+    const scaledWidth = img.width * finalScale;
+    const scaledHeight = img.height * finalScale;
     pieceWidth = scaledWidth / cols;
     pieceHeight = scaledHeight / rows;
   }

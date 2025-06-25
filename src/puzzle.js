@@ -12,7 +12,12 @@ import {
   handleKeyDown,
   getCurrentDraggedPiece as getInteractionCurrentDraggedPiece,
 } from './interaction.js';
-import { getGridRows, getGridColumns, setCurrentPuzzle } from './debug.js';
+import {
+  getGridRows,
+  getGridColumns,
+  getPieceScale,
+  setCurrentPuzzle,
+} from './debug.js';
 
 // Global state
 export let puzzleActive = false;
@@ -23,7 +28,8 @@ export function createPuzzle(imageSrc, testMode = false) {
   img.onload = () => {
     const rows = testMode ? 2 : getGridRows();
     const cols = testMode ? 2 : getGridColumns();
-    const pieces = splitImageIntoPieces(img, testMode, rows, cols);
+    const scale = testMode ? 100 : getPieceScale();
+    const pieces = splitImageIntoPieces(img, testMode, rows, cols, scale);
     displayPuzzle(pieces);
 
     // Register this puzzle with debug system for auto-reslicing (only if not in test mode)
