@@ -8,22 +8,19 @@
 
 #puzzle-container {
   display: none;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 10px;
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 20px;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .puzzle-piece {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.puzzle-piece {
+  position: absolute;
   cursor: grab;
+  transition: transform 0.3s ease;
+  outline: none;
 }
 
 .puzzle-piece:active {
@@ -31,20 +28,28 @@
 }
 
 .puzzle-piece.dragging {
-  opacity: 0.5;
-  transform: rotate(5deg);
+  opacity: 0.8;
+  z-index: 1000;
+}
+
+.puzzle-piece.selected {
+  z-index: 999;
+}
+
+.puzzle-piece.selected canvas {
+  border: 3px solid #007bff;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
 .puzzle-piece canvas {
-  max-width: 100%;
-  max-height: 100%;
   border: 2px solid #ccc;
   border-radius: 5px;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  display: block;
 }
 
 .puzzle-piece:hover canvas {
-  transform: scale(1.05);
+  border-color: #666;
 }
 
 body.dragover {
