@@ -121,9 +121,23 @@ function updatePieceIdDisplay() {
   const puzzleContainer = document.getElementById('puzzle-container');
   if (!puzzleContainer) return;
 
-  const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
+  const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
 
-  pieces.forEach((pieceElement, index) => {
+  // Sort pieces by position (left to right, top to bottom)
+  const sortedPieces = pieces.sort((a, b) => {
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+
+    // First sort by top position (y), then by left position (x)
+    const yDiff = rectA.top - rectB.top;
+    if (Math.abs(yDiff) > 10) {
+      // 10px tolerance for "same row"
+      return yDiff;
+    }
+    return rectA.left - rectB.left;
+  });
+
+  sortedPieces.forEach((pieceElement, index) => {
     // Add piece ID if enabled
     const pieceId = document.createElement('div');
     pieceId.className = 'piece-id';
@@ -146,23 +160,9 @@ function updatePieceIdDisplay() {
 export function updatePieceIdPositions() {
   if (!showPieceIds) return;
 
-  const puzzleContainer = document.getElementById('puzzle-container');
-  if (!puzzleContainer) return;
-
-  const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
-  const pieceIds = document.querySelectorAll('.piece-id');
-
-  pieces.forEach((pieceElement, index) => {
-    const pieceId = Array.from(pieceIds).find(
-      (id) => id.dataset.pieceIndex === index.toString()
-    );
-
-    if (pieceId) {
-      const position = calculatePieceIdPosition(pieceElement);
-      pieceId.style.left = `${position.left}px`;
-      pieceId.style.top = `${position.top}px`;
-    }
-  });
+  // When pieces move, we need to reassign IDs based on new positions
+  // Simply call updatePieceIdDisplay to recalculate everything
+  updatePieceIdDisplay();
 }
 
 // Getter for current state
