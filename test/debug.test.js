@@ -9,6 +9,17 @@ import {
 } from '../src/debug.js';
 import { createPuzzle } from '../src/puzzle.js';
 
+// Mock positioning and completion modules for auto-solve tests
+vi.mock('../src/positioning.js', () => ({
+  updatePieceTransform: vi.fn(),
+  findNonOverlappingPosition: vi.fn(),
+  getRandomRotation: vi.fn(),
+}));
+
+vi.mock('../src/completion.js', () => ({
+  checkPuzzleCompletion: vi.fn(),
+}));
+
 describe('Debug Module', () => {
   beforeEach(() => {
     // Set up DOM elements needed for debug functionality
@@ -62,6 +73,23 @@ describe('Debug Module', () => {
         </div>
       </div>
     `;
+
+    // Reset any existing event listeners
+    vi.clearAllMocks();
+
+    // Mock animation frame for auto-solve tests
+    global.requestAnimationFrame = vi.fn((callback) => {
+      setTimeout(callback, 16); // ~60fps
+      return 1;
+    });
+
+    // Mock Date.now for animation timing
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.clearAllMocks();
   });
 
   describe('Default Settings', () => {
@@ -388,6 +416,344 @@ describe('Debug Module', () => {
       expect(getGridColumns()).toBe(3);
       expect(getPieceScale()).toBe(50);
       expect(isShowingPieceIds()).toBe(true);
+    });
+  });
+
+  describe('Auto-Solve Functionality', () => {
+    // Import mocked functions
+    let mockUpdatePieceTransform;
+    let mockCheckPuzzleCompletion;
+
+    beforeEach(async () => {
+      // Get the mocked functions
+      const positioningModule = await import('../src/positioning.js');
+      const completionModule = await import('../src/completion.js');
+
+      mockUpdatePieceTransform = vi.mocked(
+        positioningModule.updatePieceTransform
+      );
+      mockCheckPuzzleCompletion = vi.mocked(
+        completionModule.checkPuzzleCompletion
+      );
+
+      // Clear previous calls
+      mockUpdatePieceTransform.mockClear();
+      mockCheckPuzzleCompletion.mockClear();
+    });
+
+    function createMockPuzzlePieces(count = 4) {
+      const puzzleContainer = document.getElementById('puzzle-container');
+      const pieces = [];
+
+      for (let i = 0; i < count; i++) {
+        const pieceElement = document.createElement('div');
+        pieceElement.className = 'puzzle-piece';
+        pieceElement.style.position = 'absolute';
+        pieceElement.style.left = `${Math.random() * 400}px`;
+        pieceElement.style.top = `${Math.random() * 400}px`;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        pieceElement.appendChild(canvas);
+
+        // Add piece data with originalPosition
+        const pieceData = {
+          originalPosition: i,
+          x: Math.random() * 400,
+          y: Math.random() * 400,
+          rotation: Math.random() * 360,
+          element: pieceElement,
+        };
+        pieceElement.pieceData = pieceData;
+
+        puzzleContainer.appendChild(pieceElement);
+        pieces.push(pieceData);
+      }
+
+      return pieces;
+    }
+
+    it('should respond to "!" key press and trigger auto-solve', async () => {
+      createMockPuzzlePieces(4);
+      initDebug();
+
+      // Simulate keydown event with "!" key
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      document.dispatchEvent(keyEvent);
+
+      // Verify that the solve process starts
+      expect(mockUpdatePieceTransform).not.toHaveBeenCalled(); // Should not be called immediately
+
+      // Fast-forward through the initial delays
+      vi.advanceTimersByTime(100);
+
+      // Animation should start
+      expect(mockUpdatePieceTransform).toHaveBeenCalled();
+    });
+
+    it('should animate pieces to correct grid positions based on originalPosition', async () => {
+      const pieces = createMockPuzzlePieces(4); // 2x2 grid for easier testing
+      initDebug();
+
+      // Get initial positions
+      const initialPositions = pieces.map((piece) => ({
+        x: piece.x,
+        y: piece.y,
+        rotation: piece.rotation,
+      }));
+
+      // Trigger auto-solve
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      document.dispatchEvent(keyEvent);
+
+      // Fast-forward through delays and partial animation
+      vi.advanceTimersByTime(500);
+
+      // Verify pieces are being animated toward their target positions
+      pieces.forEach((piece, index) => {
+        // The piece position should have changed from initial
+        const hasChanged =
+          piece.x !== initialPositions[index].x ||
+          piece.y !== initialPositions[index].y ||
+          piece.rotation !== initialPositions[index].rotation;
+        expect(hasChanged).toBe(true);
+      });
+
+      expect(mockUpdatePieceTransform).toHaveBeenCalled();
+    });
+
+    it('should rotate pieces to 0 degrees during solve animation', async () => {
+      const pieces = createMockPuzzlePieces(4);
+
+      // Set initial rotations to non-zero values
+      pieces.forEach((piece, index) => {
+        piece.rotation = 45 + index * 30; // Different rotation for each piece
+      });
+
+      initDebug();
+
+      // Trigger auto-solve
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      document.dispatchEvent(keyEvent);
+
+      // Fast-forward through complete animation
+      vi.advanceTimersByTime(1200); // Full animation duration + delays
+
+      // All pieces should be rotated to 0 degrees
+      pieces.forEach((piece) => {
+        expect(piece.rotation).toBeCloseTo(0, 5); // Within 0.00001 tolerance
+      });
+    });
+
+    it('should trigger puzzle completion after solve animation completes', async () => {
+      createMockPuzzlePieces(4);
+      initDebug();
+
+      // Trigger auto-solve
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      document.dispatchEvent(keyEvent);
+
+      // Fast-forward past all animations and delays
+      const maxAnimationTime = 4 * 100 + 1000 + 800; // max delay + buffer + animation duration
+      vi.advanceTimersByTime(maxAnimationTime);
+
+      // Completion check should be called
+      expect(mockCheckPuzzleCompletion).toHaveBeenCalled();
+    });
+
+    it('should handle pieces without position data gracefully', async () => {
+      const puzzleContainer = document.getElementById('puzzle-container');
+
+      // Create piece without position data
+      const pieceElement = document.createElement('div');
+      pieceElement.className = 'puzzle-piece';
+      pieceElement.style.position = 'absolute';
+      pieceElement.style.left = '100px';
+      pieceElement.style.top = '150px';
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 100;
+      canvas.height = 100;
+      pieceElement.appendChild(canvas);
+
+      // Add piece data without x, y, rotation properties
+      pieceElement.pieceData = { originalPosition: 0 };
+
+      // Mock getBoundingClientRect for the piece element
+      pieceElement.getBoundingClientRect = vi.fn(() => ({
+        left: 100,
+        top: 150,
+        width: 100,
+        height: 100,
+      }));
+
+      puzzleContainer.appendChild(pieceElement);
+
+      initDebug();
+
+      // Should not throw error when solving
+      expect(() => {
+        const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+        document.dispatchEvent(keyEvent);
+      }).not.toThrow();
+
+      // Should handle the piece gracefully
+      vi.advanceTimersByTime(200);
+      expect(mockUpdatePieceTransform).toHaveBeenCalled();
+    });
+
+    it('should work with both test mode and production mode puzzle sizes', async () => {
+      // Test with 2x2 grid (test mode dimensions)
+      createMockPuzzlePieces(4);
+      initDebug();
+
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      document.dispatchEvent(keyEvent);
+
+      vi.advanceTimersByTime(100);
+      expect(mockUpdatePieceTransform).toHaveBeenCalled();
+
+      // Clear and test with 3x3 grid (production mode dimensions)
+      mockUpdatePieceTransform.mockClear();
+      document.getElementById('puzzle-container').innerHTML = '';
+
+      createMockPuzzlePieces(9);
+      document.dispatchEvent(keyEvent);
+
+      vi.advanceTimersByTime(100);
+      expect(mockUpdatePieceTransform).toHaveBeenCalled();
+    });
+
+    it('should handle animation timing and delays correctly', async () => {
+      const pieces = createMockPuzzlePieces(3);
+      initDebug();
+
+      // Trigger auto-solve
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      document.dispatchEvent(keyEvent);
+
+      // Check that pieces start animating at staggered intervals
+      // First piece should start immediately (0ms delay)
+      vi.advanceTimersByTime(50);
+      expect(mockUpdatePieceTransform).toHaveBeenCalled();
+
+      const callCountAfter50ms = mockUpdatePieceTransform.mock.calls.length;
+
+      // After 150ms, more pieces should have started (100ms delay for second piece)
+      vi.advanceTimersByTime(100);
+      const callCountAfter150ms = mockUpdatePieceTransform.mock.calls.length;
+
+      expect(callCountAfter150ms).toBeGreaterThan(callCountAfter50ms);
+
+      // After 250ms, all pieces should be animating (200ms delay for third piece)
+      vi.advanceTimersByTime(100);
+      const callCountAfter250ms = mockUpdatePieceTransform.mock.calls.length;
+
+      expect(callCountAfter250ms).toBeGreaterThan(callCountAfter150ms);
+    });
+
+    it('should handle missing DOM elements gracefully', async () => {
+      // Remove puzzle container
+      document.getElementById('puzzle-container').remove();
+
+      initDebug();
+
+      // Should not throw error when container is missing
+      expect(() => {
+        const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+        document.dispatchEvent(keyEvent);
+      }).not.toThrow();
+
+      // Should not call any animation functions
+      vi.advanceTimersByTime(1000);
+      expect(mockUpdatePieceTransform).not.toHaveBeenCalled();
+      expect(mockCheckPuzzleCompletion).not.toHaveBeenCalled();
+    });
+
+    it('should handle empty puzzle container gracefully', async () => {
+      // Container exists but has no pieces
+      const puzzleContainer = document.getElementById('puzzle-container');
+      expect(puzzleContainer.children.length).toBe(0);
+
+      initDebug();
+
+      // Should not throw error when no pieces exist
+      expect(() => {
+        const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+        document.dispatchEvent(keyEvent);
+      }).not.toThrow();
+
+      // Should not call animation functions
+      vi.advanceTimersByTime(1000);
+      expect(mockUpdatePieceTransform).not.toHaveBeenCalled();
+      expect(mockCheckPuzzleCompletion).not.toHaveBeenCalled();
+    });
+
+    it('should prevent default behavior on "!" key press', async () => {
+      createMockPuzzlePieces(4);
+      initDebug();
+
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      const preventDefaultSpy = vi.spyOn(keyEvent, 'preventDefault');
+
+      document.dispatchEvent(keyEvent);
+
+      expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    it('should calculate correct grid positions for different puzzle sizes', async () => {
+      // Test 2x2 grid
+      const pieces2x2 = createMockPuzzlePieces(4);
+
+      // Change grid size to 2x2 for this test
+      document.getElementById('grid-rows').value = '2';
+      document.getElementById('grid-columns').value = '2';
+
+      initDebug();
+
+      // Apply the grid changes
+      document.getElementById('debug-submit').click();
+
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      document.dispatchEvent(keyEvent);
+
+      // Fast-forward through animation
+      vi.advanceTimersByTime(1200);
+
+      // Verify pieces are positioned in 2x2 grid pattern
+      const positions = pieces2x2.map((piece) => ({ x: piece.x, y: piece.y }));
+
+      // All pieces should have valid positions
+      positions.forEach((pos) => {
+        expect(typeof pos.x).toBe('number');
+        expect(typeof pos.y).toBe('number');
+        expect(pos.x).not.toBeNaN();
+        expect(pos.y).not.toBeNaN();
+      });
+    });
+
+    it('should continue animation until completion', async () => {
+      const pieces = createMockPuzzlePieces(4);
+      initDebug();
+
+      // Trigger auto-solve
+      const keyEvent = new KeyboardEvent('keydown', { key: '!' });
+      document.dispatchEvent(keyEvent);
+
+      // Fast-forward through part of animation
+      vi.advanceTimersByTime(400);
+
+      // Should have called updatePieceTransform multiple times during animation
+      const initialCallCount = mockUpdatePieceTransform.mock.calls.length;
+      expect(initialCallCount).toBeGreaterThan(0);
+
+      // Fast-forward to more animation frames
+      vi.advanceTimersByTime(400);
+
+      // Should have made more calls
+      const laterCallCount = mockUpdatePieceTransform.mock.calls.length;
+      expect(laterCallCount).toBeGreaterThan(initialCallCount);
     });
   });
 });

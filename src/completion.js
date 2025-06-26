@@ -2,6 +2,8 @@
 import { getPuzzlePieces } from './puzzle.js';
 
 export function checkPuzzleCompletion() {
+  // Expose globally for other modules to access
+  window.checkPuzzleCompletion = checkPuzzleCompletion;
   const puzzlePieces = getPuzzlePieces();
 
   // Check for legacy grid-based completion (for tests compatibility)
