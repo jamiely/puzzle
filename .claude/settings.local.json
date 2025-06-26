@@ -19,7 +19,8 @@
       "Bash(grep:*)",
       "Bash(timeout 30s npm run test:*)",
       "Bash(timeout 60s npm run test:*)",
-      "Bash(timeout 90s npm test)"
+      "Bash(timeout 90s npm test)",
+      "Bash(npm run test:*)"
     ],
     "deny": []
   }

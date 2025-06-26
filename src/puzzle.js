@@ -119,12 +119,44 @@ export function displayPuzzle(pieces) {
     puzzleContainer.appendChild(pieceContainer);
   });
 
+  // Assign stable IDs based on initial visual position (only once)
+  assignStableIds();
+
   // Add keyboard event listener for rotation
   document.addEventListener('keydown', handleKeyDown);
 
   // Update debug displays after pieces are created
   updatePieceIdPositions();
   updatePieceNumberPositions();
+}
+
+// Assign stable IDs based on initial visual position
+function assignStableIds() {
+  const puzzleContainer = document.getElementById('puzzle-container');
+  if (!puzzleContainer) return;
+
+  const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
+
+  // Sort pieces by their initial visual position (left to right, top to bottom)
+  const sortedPieces = pieces.sort((a, b) => {
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+
+    // First sort by top position (y), then by left position (x)
+    const yDiff = rectA.top - rectB.top;
+    if (Math.abs(yDiff) > 10) {
+      // 10px tolerance for "same row"
+      return yDiff;
+    }
+    return rectA.left - rectB.left;
+  });
+
+  // Assign stable ID to each piece based on sorted order
+  sortedPieces.forEach((pieceElement, index) => {
+    if (pieceElement.pieceData) {
+      pieceElement.pieceData.stableId = index;
+    }
+  });
 }
 
 // Getters for other modules to access state

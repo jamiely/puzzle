@@ -96,25 +96,17 @@ export function updatePieceIdDisplay(showPieceIds) {
 
   const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
 
-  // Sort pieces by position (left to right, top to bottom)
-  const sortedPieces = pieces.sort((a, b) => {
-    const rectA = a.getBoundingClientRect();
-    const rectB = b.getBoundingClientRect();
+  pieces.forEach((pieceElement) => {
+    const pieceData = getPieceDataByElement(pieceElement);
+    if (!pieceData || pieceData.stableId === undefined) return;
 
-    // First sort by top position (y), then by left position (x)
-    const yDiff = rectA.top - rectB.top;
-    if (Math.abs(yDiff) > 10) {
-      // 10px tolerance for "same row"
-      return yDiff;
-    }
-    return rectA.left - rectB.left;
-  });
+    // Use stable ID that was assigned based on initial visual position
+    const stableId = pieceData.stableId;
 
-  sortedPieces.forEach((pieceElement, index) => {
     // Add piece ID if enabled
     const pieceId = document.createElement('div');
     pieceId.className = 'piece-id';
-    pieceId.textContent = generatePieceId(index);
+    pieceId.textContent = generatePieceId(stableId);
 
     // Calculate position for top-right of piece
     const position = calculatePieceIdPosition(pieceElement);
@@ -125,7 +117,7 @@ export function updatePieceIdDisplay(showPieceIds) {
     document.body.appendChild(pieceId);
 
     // Store reference to piece element for cleanup
-    pieceId.dataset.pieceIndex = index;
+    pieceId.dataset.pieceIndex = stableId;
   });
 }
 

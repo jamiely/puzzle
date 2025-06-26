@@ -6,6 +6,7 @@ import {
   getPieceScale,
   isShowingPieceIds,
   initDebug,
+  updatePieceIdPositions,
 } from '../src/debug.js';
 import { createPuzzle } from '../src/puzzle.js';
 
@@ -846,6 +847,57 @@ describe('Debug Module', () => {
       // Test that callbacks can be called without error
       expect(() => updateCallback()).not.toThrow();
       expect(() => completionCallback()).not.toThrow();
+    });
+
+    it('should maintain stable piece IDs when pieces move', async () => {
+      const pieces = createMockPuzzlePieces(4);
+
+      // Assign stable IDs to pieces (simulate what happens in puzzle creation)
+      pieces.forEach((piece, index) => {
+        piece.element.pieceData.stableId = index;
+      });
+
+      initDebug();
+
+      // Get initial piece IDs
+      updatePieceIdPositions();
+      const initialIds = Array.from(document.querySelectorAll('.piece-id')).map(
+        (idElement) => ({
+          text: idElement.textContent,
+          pieceIndex: idElement.dataset.pieceIndex,
+        })
+      );
+
+      // Move pieces to different positions
+      pieces.forEach((piece, index) => {
+        piece.element.style.left = `${Math.random() * 400 + 100}px`;
+        piece.element.style.top = `${Math.random() * 400 + 100}px`;
+      });
+
+      // Update piece ID display after movement
+      updatePieceIdPositions();
+      const newIds = Array.from(document.querySelectorAll('.piece-id')).map(
+        (idElement) => ({
+          text: idElement.textContent,
+          pieceIndex: idElement.dataset.pieceIndex,
+        })
+      );
+
+      // IDs should remain the same even though pieces moved
+      expect(newIds).toHaveLength(initialIds.length);
+
+      // Sort both arrays by pieceIndex to compare properly
+      const sortedInitialIds = initialIds.sort(
+        (a, b) => parseInt(a.pieceIndex) - parseInt(b.pieceIndex)
+      );
+      const sortedNewIds = newIds.sort(
+        (a, b) => parseInt(a.pieceIndex) - parseInt(b.pieceIndex)
+      );
+
+      sortedInitialIds.forEach((initialId, index) => {
+        expect(sortedNewIds[index].text).toBe(initialId.text);
+        expect(sortedNewIds[index].pieceIndex).toBe(initialId.pieceIndex);
+      });
     });
   });
 });
