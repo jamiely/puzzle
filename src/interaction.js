@@ -1,7 +1,7 @@
 import { updatePieceTransform } from './positioning.js';
 import { checkPuzzleCompletion } from './completion.js';
 import { getPuzzlePieces } from './puzzle.js';
-import { updatePieceIdPositions } from './debug.js';
+import { updatePieceIdPositions, updatePieceNumberPositions } from './debug.js';
 
 // Interaction state
 let selectedPiece = null;
@@ -87,6 +87,7 @@ function handleMouseMove(e) {
 
   updatePieceTransform(selectedPiece);
   updatePieceIdPositions();
+  updatePieceNumberPositions();
 }
 
 function handleMouseUp() {
@@ -123,6 +124,7 @@ export function handleKeyDown(e) {
       selectedPiece.rotation -= 30;
       updatePieceTransform(selectedPiece);
       updatePieceIdPositions();
+      updatePieceNumberPositions();
       checkPuzzleCompletion();
       break;
     case 'ArrowRight':
@@ -130,6 +132,7 @@ export function handleKeyDown(e) {
       selectedPiece.rotation += 30;
       updatePieceTransform(selectedPiece);
       updatePieceIdPositions();
+      updatePieceNumberPositions();
       checkPuzzleCompletion();
       break;
   }

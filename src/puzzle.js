@@ -108,6 +108,9 @@ export function displayPuzzle(pieces) {
       placedPieces.push({ x, y, width: pieceWidth, height: pieceHeight });
     }
 
+    // Store piece data reference in DOM element for debug system
+    pieceContainer.pieceData = piece;
+
     // Make piece draggable and selectable
     makePieceInteractive(pieceContainer, piece, index);
 

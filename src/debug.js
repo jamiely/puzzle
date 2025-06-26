@@ -2,6 +2,7 @@
 
 let debugMenuVisible = false;
 let showPieceIds = false;
+let showPieceNumbers = false;
 let gridRows = 2;
 let gridColumns = 2;
 let pieceScale = 100;
@@ -32,6 +33,8 @@ export function initDebug() {
   const debugCancel = document.getElementById('debug-cancel');
   const debugSubmit = document.getElementById('debug-submit');
   const showPieceIdsCheckbox = document.getElementById('show-piece-ids');
+  const showPieceNumbersCheckbox =
+    document.getElementById('show-piece-numbers');
   const gridRowsInput = document.getElementById('grid-rows');
   const gridColumnsInput = document.getElementById('grid-columns');
   const pieceScaleInput = document.getElementById('piece-scale');
@@ -73,6 +76,12 @@ export function initDebug() {
     updatePieceIdDisplay();
   });
 
+  // Handle piece numbers toggle (immediate effect)
+  showPieceNumbersCheckbox.addEventListener('change', (e) => {
+    showPieceNumbers = e.target.checked;
+    updatePieceNumberDisplay();
+  });
+
   // Handle grid size changes (store as pending)
   gridRowsInput.addEventListener('change', (e) => {
     pendingGridRows = parseInt(e.target.value) || 2;
@@ -110,6 +119,9 @@ export function initDebug() {
     } else if (e.key.toLowerCase() === 'a') {
       e.preventDefault();
       togglePieceIds();
+    } else if (e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      togglePieceNumbers();
     }
   });
 }
@@ -148,6 +160,17 @@ function togglePieceIds() {
     showPieceIdsCheckbox.checked = showPieceIds;
   }
   updatePieceIdDisplay();
+}
+
+// Toggle piece numbers on/off
+function togglePieceNumbers() {
+  showPieceNumbers = !showPieceNumbers;
+  const showPieceNumbersCheckbox =
+    document.getElementById('show-piece-numbers');
+  if (showPieceNumbersCheckbox) {
+    showPieceNumbersCheckbox.checked = showPieceNumbers;
+  }
+  updatePieceNumberDisplay();
 }
 
 // Calculate top-right position for a piece ID
@@ -230,6 +253,91 @@ export function updatePieceIdPositions() {
   // When pieces move, we need to reassign IDs based on new positions
   // Simply call updatePieceIdDisplay to recalculate everything
   updatePieceIdDisplay();
+}
+
+// Update piece number positions (call this when pieces move)
+export function updatePieceNumberPositions() {
+  if (!showPieceNumbers) return;
+
+  // Simply call updatePieceNumberDisplay to recalculate everything
+  updatePieceNumberDisplay();
+}
+
+// Calculate top-left position for a piece number
+function calculatePieceNumberPosition(pieceElement) {
+  const canvas = pieceElement.querySelector('canvas');
+  if (!canvas) return { left: 0, top: 0 };
+
+  // Get the piece's bounding rect to find the center
+  const pieceRect = pieceElement.getBoundingClientRect();
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+
+  // Calculate the center of the piece
+  const centerX = pieceRect.left + pieceRect.width / 2;
+  const centerY = pieceRect.top + pieceRect.height / 2;
+
+  // Position at top-left relative to center (opposite of IDs)
+  const offsetX = canvasWidth * 0.49; // Same distance as IDs but opposite direction
+  const offsetY = canvasHeight * 0.49;
+
+  return {
+    left: centerX - offsetX,
+    top: centerY - offsetY,
+  };
+}
+
+// Update piece number display based on toggle state
+function updatePieceNumberDisplay() {
+  // Remove all existing piece numbers
+  const existingNumbers = document.querySelectorAll('.piece-number');
+  existingNumbers.forEach((number) => number.remove());
+
+  if (!showPieceNumbers) return;
+
+  const puzzleContainer = document.getElementById('puzzle-container');
+  if (!puzzleContainer) return;
+
+  const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
+
+  pieces.forEach((pieceElement, index) => {
+    // Find the piece data to get originalPosition
+    const pieceData = getPieceDataByElement(pieceElement);
+    if (!pieceData) return;
+
+    // Add piece number if enabled
+    const pieceNumber = document.createElement('div');
+    pieceNumber.className = 'piece-number';
+    pieceNumber.textContent = (pieceData.originalPosition + 1).toString();
+
+    // Calculate position for top-left of piece
+    const position = calculatePieceNumberPosition(pieceElement);
+    pieceNumber.style.left = `${position.left}px`;
+    pieceNumber.style.top = `${position.top}px`;
+
+    // Add to document body instead of piece element to avoid rotation
+    document.body.appendChild(pieceNumber);
+
+    // Store reference to piece element for cleanup
+    pieceNumber.dataset.pieceIndex = index;
+  });
+}
+
+// Helper function to get piece data by DOM element
+function getPieceDataByElement(pieceElement) {
+  // Get piece data stored in DOM element by puzzle.js
+  if (pieceElement.pieceData) {
+    return pieceElement.pieceData;
+  }
+
+  // Fallback: use the element index as original position
+  const puzzleContainer = document.getElementById('puzzle-container');
+  if (!puzzleContainer) return null;
+
+  const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
+  const elementIndex = pieces.indexOf(pieceElement);
+
+  return { originalPosition: elementIndex };
 }
 
 // Getter for current state
