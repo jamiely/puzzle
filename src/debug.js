@@ -1,14 +1,14 @@
 // Debug functionality for puzzle maker
 
 let debugMenuVisible = false;
-let showPieceIds = false;
+let showPieceIds = true;
 let showPieceNumbers = false;
-let gridRows = 2;
-let gridColumns = 2;
-let pieceScale = 100;
-let pendingGridRows = 2;
-let pendingGridColumns = 2;
-let pendingPieceScale = 100;
+let gridRows = 3;
+let gridColumns = 3;
+let pieceScale = 50;
+let pendingGridRows = 3;
+let pendingGridColumns = 3;
+let pendingPieceScale = 50;
 let currentImageSrc = null;
 let createPuzzleCallback = null;
 
@@ -70,6 +70,10 @@ export function initDebug() {
     hideDebugMenu();
   });
 
+  // Initialize checkbox states to match current settings
+  showPieceIdsCheckbox.checked = showPieceIds;
+  showPieceNumbersCheckbox.checked = showPieceNumbers;
+
   // Handle piece ID toggle (immediate effect)
   showPieceIdsCheckbox.addEventListener('change', (e) => {
     showPieceIds = e.target.checked;
@@ -84,16 +88,16 @@ export function initDebug() {
 
   // Handle grid size changes (store as pending)
   gridRowsInput.addEventListener('change', (e) => {
-    pendingGridRows = parseInt(e.target.value) || 2;
+    pendingGridRows = parseInt(e.target.value) || 3;
   });
 
   gridColumnsInput.addEventListener('change', (e) => {
-    pendingGridColumns = parseInt(e.target.value) || 2;
+    pendingGridColumns = parseInt(e.target.value) || 3;
   });
 
   // Handle piece scale changes (store as pending)
   pieceScaleInput.addEventListener('change', (e) => {
-    pendingPieceScale = parseInt(e.target.value) || 100;
+    pendingPieceScale = parseInt(e.target.value) || 50;
   });
 
   // Close debug menu when clicking outside

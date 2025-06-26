@@ -17,6 +17,8 @@ import {
   getGridColumns,
   getPieceScale,
   setCurrentPuzzle,
+  updatePieceIdPositions,
+  updatePieceNumberPositions,
 } from './debug.js';
 
 // Global state
@@ -119,6 +121,10 @@ export function displayPuzzle(pieces) {
 
   // Add keyboard event listener for rotation
   document.addEventListener('keydown', handleKeyDown);
+
+  // Update debug displays after pieces are created
+  updatePieceIdPositions();
+  updatePieceNumberPositions();
 }
 
 // Getters for other modules to access state
