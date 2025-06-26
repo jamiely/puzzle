@@ -13,7 +13,13 @@
       "Bash(git gc:*)",
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_close",
-      "mcp__playwright__browser_wait_for"
+      "mcp__playwright__browser_wait_for",
+      "Bash(rg:*)",
+      "Bash(npx eslint:*)",
+      "Bash(grep:*)",
+      "Bash(timeout 30s npm run test:*)",
+      "Bash(timeout 60s npm run test:*)",
+      "Bash(timeout 90s npm test)"
     ],
     "deny": []
   }

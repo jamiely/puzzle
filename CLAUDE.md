@@ -54,3 +54,9 @@ This is a browser-based image puzzle application with a modular ES6 architecture
 - Vitest with jsdom environment
 - Global mocks for Image constructor and Canvas context in `test/setup.js`
 - Tests verify both legacy grid-based swapping and new free-positioning completion logic
+
+## Best Practices
+
+- Avoid circular dependencies
+- Prefer to create many smaller modules than adding functionality to existing modules, unless the new functionality is very related
+- Avoid using global exports (do not add to the window object)

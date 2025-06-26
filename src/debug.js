@@ -1,37 +1,52 @@
 // Debug functionality for puzzle maker
+import { solvePuzzle } from './solver.js';
+import {
+  updatePieceIdDisplay,
+  updatePieceNumberDisplay,
+  generatePieceId,
+} from './debugDisplay.js';
+import {
+  isDebugMenuVisible,
+  setDebugMenuVisible,
+  isShowingPieceIds,
+  setShowPieceIds,
+  isShowingPieceNumbers,
+  setShowPieceNumbers,
+  getGridRows,
+  getGridColumns,
+  getPieceScale,
+  setPendingGridRows,
+  setPendingGridColumns,
+  setPendingPieceScale,
+  applyPendingChanges,
+  revertPendingChanges,
+  initializePendingValues,
+  reslicePuzzleIfNeeded,
+  setCurrentPuzzle,
+} from './debugConfig.js';
 
-let debugMenuVisible = false;
-let showPieceIds = true;
-let showPieceNumbers = false;
-let gridRows = 3;
-let gridColumns = 3;
-let pieceScale = 50;
-let pendingGridRows = 3;
-let pendingGridColumns = 3;
-let pendingPieceScale = 50;
-let currentImageSrc = null;
-let createPuzzleCallback = null;
+// Re-export for backwards compatibility
+export { generatePieceId } from './debugDisplay.js';
+export {
+  isDebugMenuVisible,
+  isShowingPieceIds,
+  getGridRows,
+  getGridColumns,
+  getPieceScale,
+  setCurrentPuzzle,
+} from './debugConfig.js';
 
-// Generate piece ID in A-Z, AA-ZZ format
-export function generatePieceId(index) {
-  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+// Update piece displays - called from other modules
+export function updatePieceIdPositions() {
+  updatePieceIdDisplay(isShowingPieceIds());
+}
 
-  if (index < 26) {
-    // A-Z (0-25)
-    return alphabet[index];
-  } else {
-    // AA-ZZ (26-701)
-    const first = Math.floor((index - 26) / 26);
-    const second = (index - 26) % 26;
-    return alphabet[first] + alphabet[second];
-  }
+export function updatePieceNumberPositions() {
+  updatePieceNumberDisplay(isShowingPieceNumbers());
 }
 
 // Initialize debug functionality
 export function initDebug() {
-  // Expose debug update functions globally for solver
-  window.updatePieceIdPositions = updatePieceIdPositions;
-  window.updatePieceNumberPositions = updatePieceNumberPositions;
   const debugMenu = document.getElementById('debug-menu');
   const debugCancel = document.getElementById('debug-cancel');
   const debugSubmit = document.getElementById('debug-submit');
@@ -45,62 +60,54 @@ export function initDebug() {
   // Handle cancel button - close menu and revert changes
   debugCancel.addEventListener('click', () => {
     // Revert pending changes to current values
-    gridRowsInput.value = gridRows;
-    gridColumnsInput.value = gridColumns;
-    pieceScaleInput.value = pieceScale;
-    pendingGridRows = gridRows;
-    pendingGridColumns = gridColumns;
-    pendingPieceScale = pieceScale;
+    revertPendingChanges();
+    gridRowsInput.value = getGridRows();
+    gridColumnsInput.value = getGridColumns();
+    pieceScaleInput.value = getPieceScale();
     hideDebugMenu();
   });
 
   // Handle submit button - apply changes and close menu
   debugSubmit.addEventListener('click', () => {
     // Apply pending changes
-    const hasGridChanges =
-      pendingGridRows !== gridRows || pendingGridColumns !== gridColumns;
-    const hasScaleChanges = pendingPieceScale !== pieceScale;
-
-    gridRows = pendingGridRows;
-    gridColumns = pendingGridColumns;
-    pieceScale = pendingPieceScale;
+    const { hasGridChanges, hasScaleChanges } = applyPendingChanges();
 
     // Reslice puzzle if any settings changed
     if (hasGridChanges || hasScaleChanges) {
-      reslicePuzzleIfActive();
+      reslicePuzzleIfNeeded();
     }
 
     hideDebugMenu();
   });
 
   // Initialize checkbox states to match current settings
-  showPieceIdsCheckbox.checked = showPieceIds;
-  showPieceNumbersCheckbox.checked = showPieceNumbers;
+  showPieceIdsCheckbox.checked = isShowingPieceIds();
+  showPieceNumbersCheckbox.checked = isShowingPieceNumbers();
 
   // Handle piece ID toggle (immediate effect)
   showPieceIdsCheckbox.addEventListener('change', (e) => {
-    showPieceIds = e.target.checked;
-    updatePieceIdDisplay();
+    setShowPieceIds(e.target.checked);
+    updatePieceIdPositions();
   });
 
   // Handle piece numbers toggle (immediate effect)
   showPieceNumbersCheckbox.addEventListener('change', (e) => {
-    showPieceNumbers = e.target.checked;
-    updatePieceNumberDisplay();
+    setShowPieceNumbers(e.target.checked);
+    updatePieceNumberPositions();
   });
 
   // Handle grid size changes (store as pending)
   gridRowsInput.addEventListener('change', (e) => {
-    pendingGridRows = parseInt(e.target.value) || 3;
+    setPendingGridRows(parseInt(e.target.value) || 3);
   });
 
   gridColumnsInput.addEventListener('change', (e) => {
-    pendingGridColumns = parseInt(e.target.value) || 3;
+    setPendingGridColumns(parseInt(e.target.value) || 3);
   });
 
   // Handle piece scale changes (store as pending)
   pieceScaleInput.addEventListener('change', (e) => {
-    pendingPieceScale = parseInt(e.target.value) || 50;
+    setPendingPieceScale(parseInt(e.target.value) || 50);
   });
 
   // Close debug menu when clicking outside
@@ -116,10 +123,10 @@ export function initDebug() {
 
   // Global keyboard event listener
   document.addEventListener('keydown', (e) => {
-    if (e.key === '?' && !debugMenuVisible) {
+    if (e.key === '?' && !isDebugMenuVisible()) {
       e.preventDefault();
       showDebugMenu();
-    } else if (e.key === 'Escape' && debugMenuVisible) {
+    } else if (e.key === 'Escape' && isDebugMenuVisible()) {
       e.preventDefault();
       // Treat Escape as cancel
       debugCancel.click();
@@ -131,7 +138,7 @@ export function initDebug() {
       togglePieceNumbers();
     } else if (e.key === '!') {
       e.preventDefault();
-      solvePuzzle();
+      solvePuzzleAction();
     }
   });
 }
@@ -144,368 +151,58 @@ function showDebugMenu() {
   const pieceScaleInput = document.getElementById('piece-scale');
 
   // Initialize pending values to current values
-  pendingGridRows = gridRows;
-  pendingGridColumns = gridColumns;
-  pendingPieceScale = pieceScale;
-  gridRowsInput.value = gridRows;
-  gridColumnsInput.value = gridColumns;
-  pieceScaleInput.value = pieceScale;
+  initializePendingValues();
+  gridRowsInput.value = getGridRows();
+  gridColumnsInput.value = getGridColumns();
+  pieceScaleInput.value = getPieceScale();
 
   debugMenu.style.display = 'flex';
-  debugMenuVisible = true;
+  setDebugMenuVisible(true);
 }
 
 // Hide debug menu
 function hideDebugMenu() {
   const debugMenu = document.getElementById('debug-menu');
   debugMenu.style.display = 'none';
-  debugMenuVisible = false;
+  setDebugMenuVisible(false);
 }
 
 // Toggle piece IDs on/off
 function togglePieceIds() {
-  showPieceIds = !showPieceIds;
+  setShowPieceIds(!isShowingPieceIds());
   const showPieceIdsCheckbox = document.getElementById('show-piece-ids');
   if (showPieceIdsCheckbox) {
-    showPieceIdsCheckbox.checked = showPieceIds;
+    showPieceIdsCheckbox.checked = isShowingPieceIds();
   }
-  updatePieceIdDisplay();
+  updatePieceIdPositions();
 }
 
 // Toggle piece numbers on/off
 function togglePieceNumbers() {
-  showPieceNumbers = !showPieceNumbers;
+  setShowPieceNumbers(!isShowingPieceNumbers());
   const showPieceNumbersCheckbox =
     document.getElementById('show-piece-numbers');
   if (showPieceNumbersCheckbox) {
-    showPieceNumbersCheckbox.checked = showPieceNumbers;
+    showPieceNumbersCheckbox.checked = isShowingPieceNumbers();
   }
-  updatePieceNumberDisplay();
+  updatePieceNumberPositions();
 }
 
-// Calculate top-right position for a piece ID
-function calculatePieceIdPosition(pieceElement) {
-  const canvas = pieceElement.querySelector('canvas');
-  if (!canvas) return { left: 0, top: 0 };
-
-  // Get the canvas bounding rect (this accounts for rotation)
-  const canvasRect = canvas.getBoundingClientRect();
-
-  // Calculate the center of the piece
-  const centerX = canvasRect.left + canvasRect.width / 2;
-  const centerY = canvasRect.top + canvasRect.height / 2;
-
-  // Use the original canvas dimensions for consistent offset
-  const canvasWidth = canvas.width;
-  const canvasHeight = canvas.height;
-
-  // Calculate a small offset towards top-right (screen coordinates)
-  // Use a smaller offset so it appears closer to the piece
-  const offsetX = canvasWidth * 0.49;
-  const offsetY = canvasHeight * 0.49;
-
-  return {
-    left: centerX + offsetX,
-    top: centerY - offsetY,
-  };
-}
-
-// Update piece ID display based on toggle state
-function updatePieceIdDisplay() {
-  // Remove all existing piece IDs
-  const existingIds = document.querySelectorAll('.piece-id');
-  existingIds.forEach((id) => id.remove());
-
-  if (!showPieceIds) return;
-
-  const puzzleContainer = document.getElementById('puzzle-container');
-  if (!puzzleContainer) return;
-
-  const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
-
-  // Sort pieces by position (left to right, top to bottom)
-  const sortedPieces = pieces.sort((a, b) => {
-    const rectA = a.getBoundingClientRect();
-    const rectB = b.getBoundingClientRect();
-
-    // First sort by top position (y), then by left position (x)
-    const yDiff = rectA.top - rectB.top;
-    if (Math.abs(yDiff) > 10) {
-      // 10px tolerance for "same row"
-      return yDiff;
-    }
-    return rectA.left - rectB.left;
-  });
-
-  sortedPieces.forEach((pieceElement, index) => {
-    // Add piece ID if enabled
-    const pieceId = document.createElement('div');
-    pieceId.className = 'piece-id';
-    pieceId.textContent = generatePieceId(index);
-
-    // Calculate position for top-right of piece
-    const position = calculatePieceIdPosition(pieceElement);
-    pieceId.style.left = `${position.left}px`;
-    pieceId.style.top = `${position.top}px`;
-
-    // Add to document body instead of piece element to avoid rotation
-    document.body.appendChild(pieceId);
-
-    // Store reference to piece element for cleanup
-    pieceId.dataset.pieceIndex = index;
-  });
-}
-
-// Update piece ID positions (call this when pieces move)
-export function updatePieceIdPositions() {
-  if (!showPieceIds) return;
-
-  // When pieces move, we need to reassign IDs based on new positions
-  // Simply call updatePieceIdDisplay to recalculate everything
-  updatePieceIdDisplay();
-}
-
-// Update piece number positions (call this when pieces move)
-export function updatePieceNumberPositions() {
-  if (!showPieceNumbers) return;
-
-  // Simply call updatePieceNumberDisplay to recalculate everything
-  updatePieceNumberDisplay();
-}
-
-// Calculate top-left position for a piece number
-function calculatePieceNumberPosition(pieceElement) {
-  const canvas = pieceElement.querySelector('canvas');
-  if (!canvas) return { left: 0, top: 0 };
-
-  // Get the piece's bounding rect to find the center
-  const pieceRect = pieceElement.getBoundingClientRect();
-  const canvasWidth = canvas.width;
-  const canvasHeight = canvas.height;
-
-  // Calculate the center of the piece
-  const centerX = pieceRect.left + pieceRect.width / 2;
-  const centerY = pieceRect.top + pieceRect.height / 2;
-
-  // Position at top-left relative to center (opposite of IDs)
-  const offsetX = canvasWidth * 0.49; // Same distance as IDs but opposite direction
-  const offsetY = canvasHeight * 0.49;
-
-  return {
-    left: centerX - offsetX,
-    top: centerY - offsetY,
-  };
-}
-
-// Update piece number display based on toggle state
-function updatePieceNumberDisplay() {
-  // Remove all existing piece numbers
-  const existingNumbers = document.querySelectorAll('.piece-number');
-  existingNumbers.forEach((number) => number.remove());
-
-  if (!showPieceNumbers) return;
-
-  const puzzleContainer = document.getElementById('puzzle-container');
-  if (!puzzleContainer) return;
-
-  const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
-
-  pieces.forEach((pieceElement, index) => {
-    // Find the piece data to get originalPosition
-    const pieceData = getPieceDataByElement(pieceElement);
-    if (!pieceData) return;
-
-    // Add piece number if enabled
-    const pieceNumber = document.createElement('div');
-    pieceNumber.className = 'piece-number';
-    pieceNumber.textContent = (pieceData.originalPosition + 1).toString();
-
-    // Calculate position for top-left of piece
-    const position = calculatePieceNumberPosition(pieceElement);
-    pieceNumber.style.left = `${position.left}px`;
-    pieceNumber.style.top = `${position.top}px`;
-
-    // Add to document body instead of piece element to avoid rotation
-    document.body.appendChild(pieceNumber);
-
-    // Store reference to piece element for cleanup
-    pieceNumber.dataset.pieceIndex = index;
-  });
-}
-
-// Helper function to get piece data by DOM element
-function getPieceDataByElement(pieceElement) {
-  // Get piece data stored in DOM element by puzzle.js
-  if (pieceElement.pieceData) {
-    return pieceElement.pieceData;
-  }
-
-  // Fallback: use the element index as original position
-  const puzzleContainer = document.getElementById('puzzle-container');
-  if (!puzzleContainer) return null;
-
-  const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
-  const elementIndex = pieces.indexOf(pieceElement);
-
-  return { originalPosition: elementIndex };
-}
-
-// Getter for current state
-export function isShowingPieceIds() {
-  return showPieceIds;
-}
-
-export function isDebugMenuVisible() {
-  return debugMenuVisible;
-}
-
-export function getGridRows() {
-  return gridRows;
-}
-
-export function getGridColumns() {
-  return gridColumns;
-}
-
-export function getPieceScale() {
-  return pieceScale;
-}
-
-// Set the current image source and puzzle creation callback for auto-reslicing
-export function setCurrentPuzzle(imageSrc, puzzleCreator) {
-  currentImageSrc = imageSrc;
-  createPuzzleCallback = puzzleCreator;
-}
-
-// Reslice puzzle if one is currently active
-function reslicePuzzleIfActive() {
-  if (currentImageSrc && createPuzzleCallback) {
-    // Small delay to ensure UI updates are complete
-    setTimeout(() => {
-      createPuzzleCallback(currentImageSrc);
-    }, 100);
-  }
-}
-
-// Solve puzzle by animating pieces to their correct positions
-function solvePuzzle() {
-  const puzzleContainer = document.getElementById('puzzle-container');
-  if (!puzzleContainer) return;
-
-  const pieces = Array.from(puzzleContainer.querySelectorAll('.puzzle-piece'));
-  if (pieces.length === 0) return;
-
-  // Calculate the solved puzzle layout based on current grid size
-  const rows = gridRows;
-  const cols = gridColumns;
-
-  // Calculate container center and piece dimensions for grid layout
-  const containerRect = puzzleContainer.getBoundingClientRect();
-  const containerCenterX = containerRect.width / 2;
-  const containerCenterY = containerRect.height / 2;
-
-  // Get piece dimensions (assume all pieces are similar size)
-  const firstPieceCanvas = pieces[0].querySelector('canvas');
-  const pieceWidth = firstPieceCanvas.width;
-  const pieceHeight = firstPieceCanvas.height;
-
-  // Calculate grid layout dimensions
-  const gridWidth = cols * pieceWidth;
-  const gridHeight = rows * pieceHeight;
-  const startX = containerCenterX - gridWidth / 2;
-  const startY = containerCenterY - gridHeight / 2;
-
-  // Animate each piece to its correct position
-  pieces.forEach((pieceElement, index) => {
-    const pieceData = getPieceDataByElement(pieceElement);
-    if (!pieceData) return;
-
-    const targetPosition = pieceData.originalPosition;
-    const targetRow = Math.floor(targetPosition / cols);
-    const targetCol = targetPosition % cols;
-
-    // Calculate target position
-    const targetX = startX + targetCol * pieceWidth;
-    const targetY = startY + targetRow * pieceHeight;
-    const targetRotation = 0; // Pieces should be unrotated in solved state
-
-    // Get current piece data or create it
-    let piece = pieceData;
-    if (!piece.x && !piece.y && piece.rotation === undefined) {
-      // If piece doesn't have position data, get it from DOM
-      const currentRect = pieceElement.getBoundingClientRect();
-      piece.x = currentRect.left;
-      piece.y = currentRect.top;
-      piece.rotation = 0;
-      piece.element = pieceElement;
-    }
-
-    // Animate the piece to its target position
-    animatePieceToPosition(
-      piece,
-      targetX,
-      targetY,
-      targetRotation,
-      index * 100
-    );
-  });
-
-  // Check completion after all animations are done
-  const maxDelay = pieces.length * 100 + 1000; // Animation duration + buffer
-  setTimeout(() => {
-    // Call completion check if available (avoid circular import)
-    if (window.checkPuzzleCompletion) {
-      window.checkPuzzleCompletion();
-    }
-  }, maxDelay);
-}
-
-// Animate a piece to a target position with rotation
-function animatePieceToPosition(
-  piece,
-  targetX,
-  targetY,
-  targetRotation,
-  delay = 0
-) {
-  if (!piece.element) return;
-
-  setTimeout(() => {
-    const duration = 800; // Animation duration in ms
-    const startTime = Date.now();
-    const startX = piece.x;
-    const startY = piece.y;
-    const startRotation = piece.rotation;
-
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Easing function (ease-out)
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-
-      // Interpolate position and rotation
-      piece.x = startX + (targetX - startX) * easeOut;
-      piece.y = startY + (targetY - startY) * easeOut;
-      piece.rotation =
-        startRotation + (targetRotation - startRotation) * easeOut;
-
-      // Update the piece transform using updatePieceTransform (avoid import)
-      if (piece.element) {
-        piece.element.style.left = `${piece.x}px`;
-        piece.element.style.top = `${piece.y}px`;
-        piece.element.style.transform = `rotate(${piece.rotation}deg)`;
-      }
-
-      // Update debug displays
+// Solve puzzle action
+function solvePuzzleAction() {
+  solvePuzzle(
+    getGridRows(),
+    getGridColumns(),
+    () => {
+      // Update callback
       updatePieceIdPositions();
       updatePieceNumberPositions();
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      }
-    };
-
-    requestAnimationFrame(animate);
-  }, delay);
+    },
+    () => {
+      // Completion callback - import and call completion check
+      import('./completion.js').then((module) => {
+        module.checkPuzzleCompletion();
+      });
+    }
+  );
 }

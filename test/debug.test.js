@@ -102,10 +102,10 @@ describe('Debug Module', () => {
 
     // Reset any existing event listeners
     vi.clearAllMocks();
-    
+
     // Clear document event listeners to prevent accumulation across tests
     const events = ['keydown', 'scroll', 'resize'];
-    events.forEach(event => {
+    events.forEach((event) => {
       document.removeEventListener(event, () => {});
       window.removeEventListener(event, () => {});
     });
@@ -188,11 +188,14 @@ describe('Debug Module', () => {
       createPuzzle(mockImageSrc, false);
 
       // Wait for image to load and pieces to be created
-      await vi.waitFor(() => {
-        const puzzleContainer = document.getElementById('puzzle-container');
-        const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
-        return pieces.length === 9;
-      }, { timeout: 1000 });
+      await vi.waitFor(
+        () => {
+          const puzzleContainer = document.getElementById('puzzle-container');
+          const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
+          return pieces.length === 9;
+        },
+        { timeout: 1000 }
+      );
 
       const puzzleContainer = document.getElementById('puzzle-container');
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -216,13 +219,16 @@ describe('Debug Module', () => {
       });
 
       createPuzzle(mockImageSrc, false);
-      
+
       // Wait for pieces to be created
-      await vi.waitFor(() => {
-        const puzzleContainer = document.getElementById('puzzle-container');
-        const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
-        return pieces.length === 9;
-      }, { timeout: 1000 });
+      await vi.waitFor(
+        () => {
+          const puzzleContainer = document.getElementById('puzzle-container');
+          const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
+          return pieces.length === 9;
+        },
+        { timeout: 1000 }
+      );
 
       const puzzleContainer = document.getElementById('puzzle-container');
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -244,14 +250,17 @@ describe('Debug Module', () => {
       initDebug();
 
       createPuzzle(mockImageSrc, false);
-      
+
       // Wait for pieces and piece IDs to be created
-      await vi.waitFor(() => {
-        const puzzleContainer = document.getElementById('puzzle-container');
-        const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
-        const pieceIds = document.querySelectorAll('.piece-id');
-        return pieces.length === 9 && pieceIds.length === 9;
-      }, { timeout: 1000 });
+      await vi.waitFor(
+        () => {
+          const puzzleContainer = document.getElementById('puzzle-container');
+          const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
+          const pieceIds = document.querySelectorAll('.piece-id');
+          return pieces.length === 9 && pieceIds.length === 9;
+        },
+        { timeout: 1000 }
+      );
 
       // Check that piece IDs are created and displayed
       const pieceIds = document.querySelectorAll('.piece-id');
@@ -272,13 +281,16 @@ describe('Debug Module', () => {
 
       // Create puzzle in test mode
       createPuzzle(mockImageSrc, true);
-      
+
       // Wait for pieces to be created
-      await vi.waitFor(() => {
-        const puzzleContainer = document.getElementById('puzzle-container');
-        const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
-        return pieces.length === 4;
-      }, { timeout: 1000 });
+      await vi.waitFor(
+        () => {
+          const puzzleContainer = document.getElementById('puzzle-container');
+          const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
+          return pieces.length === 4;
+        },
+        { timeout: 1000 }
+      );
 
       const puzzleContainer = document.getElementById('puzzle-container');
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -292,13 +304,16 @@ describe('Debug Module', () => {
       const mockImageSrc = 'data:image/jpeg;base64,test';
 
       createPuzzle(mockImageSrc, false);
-      
+
       // Wait for pieces to be created
-      await vi.waitFor(() => {
-        const puzzleContainer = document.getElementById('puzzle-container');
-        const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
-        return pieces.length === 9;
-      }, { timeout: 1000 });
+      await vi.waitFor(
+        () => {
+          const puzzleContainer = document.getElementById('puzzle-container');
+          const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
+          return pieces.length === 9;
+        },
+        { timeout: 1000 }
+      );
 
       const puzzleContainer = document.getElementById('puzzle-container');
       const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -395,13 +410,16 @@ describe('Debug Module', () => {
       // Create puzzle multiple times
       for (let i = 0; i < 3; i++) {
         createPuzzle(mockImageSrc, false);
-        
+
         // Wait for pieces to be created
-        await vi.waitFor(() => {
-          const puzzleContainer = document.getElementById('puzzle-container');
-          const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
-          return pieces.length === 9;
-        }, { timeout: 1000 });
+        await vi.waitFor(
+          () => {
+            const puzzleContainer = document.getElementById('puzzle-container');
+            const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
+            return pieces.length === 9;
+          },
+          { timeout: 1000 }
+        );
 
         const puzzleContainer = document.getElementById('puzzle-container');
         const pieces = puzzleContainer.querySelectorAll('.puzzle-piece');
@@ -420,20 +438,26 @@ describe('Debug Module', () => {
 
       // Create first puzzle
       createPuzzle(mockImageSrc, false);
-      await vi.waitFor(() => {
-        const pieceIds = document.querySelectorAll('.piece-id');
-        return pieceIds.length === 9;
-      }, { timeout: 1000 });
+      await vi.waitFor(
+        () => {
+          const pieceIds = document.querySelectorAll('.piece-id');
+          return pieceIds.length === 9;
+        },
+        { timeout: 1000 }
+      );
 
       let pieceIds = document.querySelectorAll('.piece-id');
       expect(pieceIds).toHaveLength(9);
 
       // Create second puzzle
       createPuzzle(mockImageSrc, false);
-      await vi.waitFor(() => {
-        const pieceIds = document.querySelectorAll('.piece-id');
-        return pieceIds.length === 9;
-      }, { timeout: 1000 });
+      await vi.waitFor(
+        () => {
+          const pieceIds = document.querySelectorAll('.piece-id');
+          return pieceIds.length === 9;
+        },
+        { timeout: 1000 }
+      );
 
       pieceIds = document.querySelectorAll('.piece-id');
       expect(pieceIds).toHaveLength(9); // Should still show piece IDs
@@ -513,10 +537,10 @@ describe('Debug Module', () => {
       // Clear previous calls
       mockSolvePuzzle.mockClear();
       mockCheckPuzzleCompletion.mockClear();
-      
+
       // Reset call counts to prevent accumulation across tests
       mockSolvePuzzle.mockImplementation(() => {});
-      
+
       // Reset debug initialization flag
       hasInitializedDebug = false;
     });
@@ -567,7 +591,7 @@ describe('Debug Module', () => {
         3, // gridRows
         3, // gridColumns
         expect.any(Function), // update callback
-        expect.any(Function)  // completion callback
+        expect.any(Function) // completion callback
       );
     });
 
@@ -584,7 +608,7 @@ describe('Debug Module', () => {
         3, // gridRows (default)
         3, // gridColumns (default)
         expect.any(Function), // update callback
-        expect.any(Function)  // completion callback
+        expect.any(Function) // completion callback
       );
     });
 
@@ -630,7 +654,7 @@ describe('Debug Module', () => {
 
       // The completion callback should be a function that handles dynamic import
       expect(typeof completionCallback).toBe('function');
-      
+
       // Call the completion callback - it should handle the dynamic import internally
       // We can't easily test the dynamic import without significant mocking overhead
       expect(() => completionCallback()).not.toThrow();
@@ -685,7 +709,10 @@ describe('Debug Module', () => {
       document.dispatchEvent(keyEvent);
 
       expect(mockSolvePuzzle).toHaveBeenCalledWith(
-        3, 3, expect.any(Function), expect.any(Function)
+        3,
+        3,
+        expect.any(Function),
+        expect.any(Function)
       );
 
       // Clear and test with 3x3 grid (production mode dimensions)
@@ -696,19 +723,22 @@ describe('Debug Module', () => {
       document.dispatchEvent(keyEvent);
 
       expect(mockSolvePuzzle).toHaveBeenCalledWith(
-        3, 3, expect.any(Function), expect.any(Function)
+        3,
+        3,
+        expect.any(Function),
+        expect.any(Function)
       );
     });
 
     it('should pass correct grid parameters to solve function', async () => {
       const pieces = createMockPuzzlePieces(3);
-      
+
       // Only initialize debug once to prevent multiple event listeners
       if (!hasInitializedDebug) {
         initDebug();
         hasInitializedDebug = true;
       }
-      
+
       // Clear calls right before the test action
       mockSolvePuzzle.mockClear();
 
@@ -719,9 +749,9 @@ describe('Debug Module', () => {
       // Verify correct parameters are passed
       expect(mockSolvePuzzle).toHaveBeenCalledWith(
         3, // gridRows from config
-        3, // gridColumns from config  
+        3, // gridColumns from config
         expect.any(Function), // update callback
-        expect.any(Function)  // completion callback
+        expect.any(Function) // completion callback
       );
 
       // Verify it's called at least once (may be more due to event listener accumulation)
@@ -785,7 +815,7 @@ describe('Debug Module', () => {
       expect(mockSolvePuzzle).toHaveBeenCalledWith(
         3, // gridRows (default)
         3, // gridColumns (default)
-        expect.any(Function), 
+        expect.any(Function),
         expect.any(Function)
       );
     });
@@ -800,18 +830,19 @@ describe('Debug Module', () => {
 
       // Verify solvePuzzle was called
       expect(mockSolvePuzzle).toHaveBeenCalled();
-      
+
       // Get the callbacks passed to solvePuzzle
-      const [gridRows, gridColumns, updateCallback, completionCallback] = mockSolvePuzzle.mock.calls[0];
-      
+      const [gridRows, gridColumns, updateCallback, completionCallback] =
+        mockSolvePuzzle.mock.calls[0];
+
       // Verify callbacks are functions
       expect(typeof updateCallback).toBe('function');
       expect(typeof completionCallback).toBe('function');
-      
+
       // Verify parameters are correct
       expect(gridRows).toBe(3);
       expect(gridColumns).toBe(3);
-      
+
       // Test that callbacks can be called without error
       expect(() => updateCallback()).not.toThrow();
       expect(() => completionCallback()).not.toThrow();
