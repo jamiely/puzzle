@@ -1,19 +1,10 @@
 import { handleFile, puzzleActive, createPuzzle } from './src/puzzle.js';
-import {
-  initAutoload,
-  startAutoLoadTimer,
-  cancelAutoLoadTimer,
-} from './src/autoload.js';
 import { initDebug } from './src/debug.js';
 
 const fileInput = document.getElementById('file-input');
 
-// Initialize autoload module
-initAutoload(createPuzzle, () => puzzleActive);
-
 document.addEventListener('click', () => {
   if (!puzzleActive) {
-    cancelAutoLoadTimer();
     fileInput.click();
   }
 });
@@ -33,7 +24,6 @@ document.addEventListener('dragleave', (e) => {
 document.addEventListener('drop', (e) => {
   e.preventDefault();
   document.body.classList.remove('dragover');
-  cancelAutoLoadTimer();
 
   const files = e.dataTransfer.files;
   if (files.length > 0) {
@@ -42,7 +32,6 @@ document.addEventListener('drop', (e) => {
 });
 
 fileInput.addEventListener('change', (e) => {
-  cancelAutoLoadTimer();
   if (e.target.files.length > 0) {
     handleFile(e.target.files[0]);
   }
@@ -70,25 +59,19 @@ async function loadPuzzleFromPath(puzzlePath) {
       };
 
       img.onerror = () => {
-        // Image failed to load, fall back to auto-load timer
-        console.warn(
-          `Puzzle image not found: ${puzzlePath}. Falling back to auto-load.`
-        );
-        startAutoLoadTimer();
+        // Image failed to load
+        console.warn(`Puzzle image not found: ${puzzlePath}.`);
         reject(new Error(`Image not found: ${puzzlePath}`));
       };
 
       img.src = puzzlePath;
     });
   } catch (error) {
-    console.warn(
-      `Error loading puzzle: ${error.message}. Falling back to auto-load.`
-    );
-    startAutoLoadTimer();
+    console.warn(`Error loading puzzle: ${error.message}.`);
   }
 }
 
-// Load puzzle from query parameter or start auto-load timer
+// Load puzzle from query parameter
 document.addEventListener('DOMContentLoaded', async () => {
   initDebug();
 
@@ -98,8 +81,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Immediately load the specified puzzle
     const puzzlePath = `assets/${queryParams.puzzle}.jpg`;
     await loadPuzzleFromPath(puzzlePath);
-  } else {
-    // No puzzle specified, start the auto-load timer
-    startAutoLoadTimer();
   }
 });

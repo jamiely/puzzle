@@ -7,11 +7,6 @@ vi.mock('../src/puzzle.js', () => ({
   createPuzzle: vi.fn(),
 }));
 
-vi.mock('../src/autoload.js', () => ({
-  initAutoload: vi.fn(),
-  startAutoLoadTimer: vi.fn(),
-  cancelAutoLoadTimer: vi.fn(),
-}));
 
 vi.mock('../src/debug.js', () => ({
   initDebug: vi.fn(),
@@ -19,7 +14,6 @@ vi.mock('../src/debug.js', () => ({
 
 describe('Query String Puzzle Loading', () => {
   let mockCreatePuzzle;
-  let mockStartAutoLoadTimer;
   let mockInitDebug;
   let originalLocation;
 
@@ -36,11 +30,9 @@ describe('Query String Puzzle Loading', () => {
 
     // Get mocked functions
     const puzzleModule = await import('../src/puzzle.js');
-    const autoloadModule = await import('../src/autoload.js');
     const debugModule = await import('../src/debug.js');
 
     mockCreatePuzzle = vi.mocked(puzzleModule.createPuzzle);
-    mockStartAutoLoadTimer = vi.mocked(autoloadModule.startAutoLoadTimer);
     mockInitDebug = vi.mocked(debugModule.initDebug);
 
     // Clear the DOM
@@ -76,10 +68,9 @@ describe('Query String Puzzle Loading', () => {
 
     // Verify puzzle was loaded with correct path
     expect(mockCreatePuzzle).toHaveBeenCalledWith('assets/sloth.jpg');
-    expect(mockStartAutoLoadTimer).not.toHaveBeenCalled();
   });
 
-  it('should start auto-load timer when no puzzle query parameter is present', async () => {
+  it('should do nothing when no puzzle query parameter is present', async () => {
     // No query string
     window.location.search = '';
 
@@ -95,13 +86,10 @@ describe('Query String Puzzle Loading', () => {
     if (queryParams.puzzle) {
       const puzzlePath = `assets/${queryParams.puzzle}.jpg`;
       mockCreatePuzzle(puzzlePath);
-    } else {
-      mockStartAutoLoadTimer();
     }
 
-    // Verify auto-load timer was started instead of loading puzzle
+    // Verify no puzzle was loaded when no parameter is present
     expect(mockCreatePuzzle).not.toHaveBeenCalled();
-    expect(mockStartAutoLoadTimer).toHaveBeenCalled();
   });
 
   it('should handle different puzzle names correctly', async () => {
@@ -114,7 +102,6 @@ describe('Query String Puzzle Loading', () => {
     for (const testCase of testCases) {
       // Clear previous calls
       mockCreatePuzzle.mockClear();
-      mockStartAutoLoadTimer.mockClear();
 
       // Set up query string
       window.location.search = testCase.query;
@@ -131,7 +118,6 @@ describe('Query String Puzzle Loading', () => {
 
       // Verify correct path was used
       expect(mockCreatePuzzle).toHaveBeenCalledWith(testCase.expected);
-      expect(mockStartAutoLoadTimer).not.toHaveBeenCalled();
     }
   });
 
@@ -163,20 +149,17 @@ describe('Query String Puzzle Loading', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const puzzleName = urlParams.get('puzzle');
 
-    // Empty string should be falsy and trigger auto-load timer
+    // Empty string should be falsy
     expect(puzzleName).toBe('');
 
     // Simulate script behavior
     if (puzzleName) {
       const puzzlePath = `assets/${puzzleName}.jpg`;
       mockCreatePuzzle(puzzlePath);
-    } else {
-      mockStartAutoLoadTimer();
     }
 
-    // Verify auto-load timer was started for empty parameter
+    // Verify no puzzle was loaded for empty parameter
     expect(mockCreatePuzzle).not.toHaveBeenCalled();
-    expect(mockStartAutoLoadTimer).toHaveBeenCalled();
   });
 
   it('should handle URL encoding in puzzle parameter', async () => {
