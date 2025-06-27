@@ -48,8 +48,58 @@ fileInput.addEventListener('change', (e) => {
   }
 });
 
-// Start the auto-load timer when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-  startAutoLoadTimer();
+// Parse URL query parameters for puzzle selection
+export function parseQueryParameters() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return {
+    puzzle: urlParams.get('puzzle'),
+  };
+}
+
+// Load puzzle with error handling
+async function loadPuzzleFromPath(puzzlePath) {
+  try {
+    // Test if the image exists by creating an Image object
+    const img = new Image();
+
+    return new Promise((resolve, reject) => {
+      img.onload = () => {
+        // Image loaded successfully, create the puzzle
+        createPuzzle(puzzlePath);
+        resolve();
+      };
+
+      img.onerror = () => {
+        // Image failed to load, fall back to auto-load timer
+        console.warn(
+          `Puzzle image not found: ${puzzlePath}. Falling back to auto-load.`
+        );
+        startAutoLoadTimer();
+        reject(new Error(`Image not found: ${puzzlePath}`));
+      };
+
+      img.src = puzzlePath;
+    });
+  } catch (error) {
+    console.warn(
+      `Error loading puzzle: ${error.message}. Falling back to auto-load.`
+    );
+    startAutoLoadTimer();
+  }
+}
+
+// Load puzzle from query parameter or start auto-load timer
+document.addEventListener('DOMContentLoaded', async () => {
   initDebug();
+
+  const queryParams = parseQueryParameters();
+
+  if (queryParams.puzzle) {
+    // Immediately load the specified puzzle
+    const puzzlePath = `assets/${queryParams.puzzle}.jpg`;
+    await loadPuzzleFromPath(puzzlePath);
+  } else {
+    // No puzzle specified, start the auto-load timer
+    startAutoLoadTimer();
+  }
 });
