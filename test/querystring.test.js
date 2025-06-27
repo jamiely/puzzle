@@ -190,9 +190,12 @@ describe('Query String Puzzle Loading', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const result = {
         puzzle: urlParams.get('puzzle'),
+        rows: null,
+        columns: null,
+        scale: null,
       };
 
-      expect(result).toEqual({ puzzle: 'test' });
+      expect(result).toEqual({ puzzle: 'test', rows: null, columns: null, scale: null });
     });
 
     it('should return null for missing puzzle parameter', () => {
@@ -201,9 +204,12 @@ describe('Query String Puzzle Loading', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const result = {
         puzzle: urlParams.get('puzzle'),
+        rows: null,
+        columns: null,
+        scale: null,
       };
 
-      expect(result).toEqual({ puzzle: null });
+      expect(result).toEqual({ puzzle: null, rows: null, columns: null, scale: null });
     });
 
     it('should return null for no query string', () => {
@@ -212,9 +218,92 @@ describe('Query String Puzzle Loading', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const result = {
         puzzle: urlParams.get('puzzle'),
+        rows: null,
+        columns: null,
+        scale: null,
       };
 
-      expect(result).toEqual({ puzzle: null });
+      expect(result).toEqual({ puzzle: null, rows: null, columns: null, scale: null });
+    });
+
+    it('should parse configuration parameters correctly', () => {
+      window.location.search = '?puzzle=test&rows=4&columns=5&scale=75';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const parseIntParam = (value, defaultValue, min, max) => {
+        if (!value) return defaultValue;
+        const parsed = parseInt(value, 10);
+        if (isNaN(parsed) || parsed < min || parsed > max) return defaultValue;
+        return parsed;
+      };
+
+      const result = {
+        puzzle: urlParams.get('puzzle'),
+        rows: parseIntParam(urlParams.get('rows'), null, 2, 10),
+        columns: parseIntParam(urlParams.get('columns'), null, 2, 10),
+        scale: parseIntParam(urlParams.get('scale'), null, 25, 200),
+      };
+
+      expect(result).toEqual({ 
+        puzzle: 'test', 
+        rows: 4, 
+        columns: 5, 
+        scale: 75 
+      });
+    });
+
+    it('should validate configuration parameters within bounds', () => {
+      window.location.search = '?rows=15&columns=1&scale=300';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const parseIntParam = (value, defaultValue, min, max) => {
+        if (!value) return defaultValue;
+        const parsed = parseInt(value, 10);
+        if (isNaN(parsed) || parsed < min || parsed > max) return defaultValue;
+        return parsed;
+      };
+
+      const result = {
+        puzzle: urlParams.get('puzzle'),
+        rows: parseIntParam(urlParams.get('rows'), null, 2, 10),
+        columns: parseIntParam(urlParams.get('columns'), null, 2, 10),
+        scale: parseIntParam(urlParams.get('scale'), null, 25, 200),
+      };
+
+      // Out of bounds values should return null (defaults)
+      expect(result).toEqual({ 
+        puzzle: null, 
+        rows: null,    // 15 > max 10
+        columns: null, // 1 < min 2 
+        scale: null    // 300 > max 200
+      });
+    });
+
+    it('should handle invalid numeric parameters', () => {
+      window.location.search = '?rows=abc&columns=&scale=not-a-number';
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const parseIntParam = (value, defaultValue, min, max) => {
+        if (!value) return defaultValue;
+        const parsed = parseInt(value, 10);
+        if (isNaN(parsed) || parsed < min || parsed > max) return defaultValue;
+        return parsed;
+      };
+
+      const result = {
+        puzzle: urlParams.get('puzzle'),
+        rows: parseIntParam(urlParams.get('rows'), null, 2, 10),
+        columns: parseIntParam(urlParams.get('columns'), null, 2, 10),
+        scale: parseIntParam(urlParams.get('scale'), null, 25, 200),
+      };
+
+      // Invalid values should return null (defaults)
+      expect(result).toEqual({ 
+        puzzle: null, 
+        rows: null,    // 'abc' is NaN
+        columns: null, // empty string
+        scale: null    // 'not-a-number' is NaN
+      });
     });
   });
 });

@@ -1,5 +1,6 @@
 import { handleFile, puzzleActive, createPuzzle } from './src/puzzle.js';
 import { initDebug } from './src/debug.js';
+import { initializeConfigFromQueryParams } from './src/debugConfig.js';
 
 const fileInput = document.getElementById('file-input');
 
@@ -37,11 +38,23 @@ fileInput.addEventListener('change', (e) => {
   }
 });
 
-// Parse URL query parameters for puzzle selection
+// Parse URL query parameters for puzzle selection and configuration
 export function parseQueryParameters() {
   const urlParams = new URLSearchParams(window.location.search);
+  
+  // Parse numeric parameters with validation
+  const parseIntParam = (value, defaultValue, min, max) => {
+    if (!value) return defaultValue;
+    const parsed = parseInt(value, 10);
+    if (isNaN(parsed) || parsed < min || parsed > max) return defaultValue;
+    return parsed;
+  };
+  
   return {
     puzzle: urlParams.get('puzzle'),
+    rows: parseIntParam(urlParams.get('rows'), null, 2, 10),
+    columns: parseIntParam(urlParams.get('columns'), null, 2, 10),
+    scale: parseIntParam(urlParams.get('scale'), null, 25, 200),
   };
 }
 
@@ -73,9 +86,12 @@ async function loadPuzzleFromPath(puzzlePath) {
 
 // Load puzzle from query parameter
 document.addEventListener('DOMContentLoaded', async () => {
-  initDebug();
-
   const queryParams = parseQueryParameters();
+  
+  // Initialize configuration from query parameters
+  initializeConfigFromQueryParams(queryParams);
+  
+  initDebug();
 
   if (queryParams.puzzle) {
     // Immediately load the specified puzzle

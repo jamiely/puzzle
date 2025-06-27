@@ -119,6 +119,22 @@ export function initializePendingValues() {
   debugState.pendingPieceScale = debugState.pieceScale;
 }
 
+// Initialize config from query parameters or defaults
+export function initializeConfigFromQueryParams(queryParams) {
+  if (queryParams.rows !== null) {
+    debugState.gridRows = queryParams.rows;
+    debugState.pendingGridRows = queryParams.rows;
+  }
+  if (queryParams.columns !== null) {
+    debugState.gridColumns = queryParams.columns;
+    debugState.pendingGridColumns = queryParams.columns;
+  }
+  if (queryParams.scale !== null) {
+    debugState.pieceScale = queryParams.scale;
+    debugState.pendingPieceScale = queryParams.scale;
+  }
+}
+
 // Reslice puzzle if one is currently active
 export function reslicePuzzleIfNeeded() {
   if (debugState.currentImageSrc && debugState.createPuzzleCallback) {
